@@ -1,0 +1,144 @@
+:root {
+    --red-color: #fc2f2f;
+    --blue-color: #389cf9;
+    --yellow-color: gold;
+    --navy-color: #263343;
+    --orange-color: #d49466;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    border-bottom: 1px solid #dddd;
+}
+
+a {
+    
+    text-decoration: none;
+    color:black;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: whitesmoke;
+    
+    padding: 6px 20px;
+}
+
+.navbar_logo {
+    
+    font-size: 20px;
+}
+
+.navbar_logo i {
+    font-size: 30px;
+    color: var(--orange-color);
+}
+      
+.navbar_menu {
+    display: flex;
+    list-style: none;
+    font-size: 16px;
+    padding-left: 0;
+}
+
+.navbar_menu li {
+    padding: 6px 10px;
+}
+
+.navbar_menu li:hover {
+    background-color: #aca3a3;;
+    border-radius: 4px;
+}
+
+.fa-filter-circle-xmark {
+    padding-right: 5px;
+    color: var(--navy-color);
+}
+
+.fa-arrow-up {
+    padding-right: 5px;
+    color: var(--red-color);
+}
+
+.fa-arrow-down {
+    padding-right: 5px;
+    color: var(--blue-color);
+}
+
+.fa-bookmark {
+    padding-right: 5px;
+    color: var(--yellow-color);
+}
+
+.navbar_login {
+    display: flex;
+    list-style: none;
+    font-size: 16px;
+    padding-left: 0;
+}
+
+.navbar_login i {
+    font-size: 20px;
+    color: var(--orange-color);
+}
+
+.navbar_login li {
+    padding: 6px 10px;
+}
+
+.navbar_login li:hover {
+    background-color: #aca3a3;
+    border-radius: 4px;
+}
+
+.toggleBtn {
+    display: none;
+    position: absolute;
+    right: 32px;
+    font-size: 20px;
+    color:var(--orange-color)
+}
+
+
+@media(max-width:770px){
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 6px 10px;
+    }
+
+    .navbar_menu {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .navbar_menu li {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .navbar_login {
+        display: none;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .navbar_login li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .toggleBtn {
+        display: block;
+    }
+
+    .navbar_menu.active,
+    .navbar_login.active {
+        display: flex;
+    }
+}
