@@ -9,7 +9,7 @@
 body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
-    border-bottom: 1px solid #dddd;
+    border-bottom: 1px solid black !important;
 }
 
 a {
@@ -102,6 +102,9 @@ a {
     color:var(--orange-color)
 }
 
+#map {
+    margin: auto !important;
+}
 
 @media(max-width:770px){
     .navbar {
