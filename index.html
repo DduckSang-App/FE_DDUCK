@@ -9,6 +9,9 @@
         <script src="https://kit.fontawesome.com/967b5a4a71.js" 
         crossorigin="anonymous">
         </script>
+        <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=459b020ef210fc432886e6e1ce2d7395&libraries=clusterer"></script>
+        <script src="map.js" defer></script>
         <script src="main.js" defer></script>
         <title>오늘의 아파트</title>
     </head>
@@ -22,7 +25,6 @@
             </div>
 
             <ul class="navbar_menu">
-                
                 <li><i class="fa-solid fa-filter-circle-xmark"></i><a href="#">필터 해제</a></li>
                 <li><i class="fa-solid fa-arrow-up"></i><a href="#" class="up">상승</a></li>
                 <li><i class="fa-solid fa-arrow-down"></i><a href="#" class="down">하락</a></li>
@@ -31,7 +33,7 @@
             </ul>
 
             <ul class="navbar_login">
-                <li><i class="fa-solid fa-angles-right"></i> <a href="#">로그인/회원가입</a></li>
+                <li><i class="fa-solid fa-angles-right"></i> <a href="login.html">로그인/회원가입</a></li>
             </ul>
             <a href= "#" class="toggleBtn">
                 <i class="fa-solid fa-bars"></i>
@@ -40,8 +42,7 @@
 
         <!--지도 표시할 div / KAKAO MAP API-->
         <div id="map" style="width:800px;height:750px;"></div>
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=459b020ef210fc432886e6e1ce2d7395"></script>
-        <script src="map.js" defer></script>
+        
 
     </body>
 </html>
