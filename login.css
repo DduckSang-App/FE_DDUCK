@@ -1,0 +1,66 @@
+:root {
+    --black-color: black;
+    --white-color: whitesmoke;
+    --gray-color: #aca3a3;
+    --red-color: #fc2f2f;
+    --blue-color: #389cf9;
+    --yellow-color: gold;
+    --navy-color: #263343;
+    --orange-color: #d49466;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color:var(--black-color);
+}
+
+.title {
+    margin: 16px;
+}
+
+.login_form {
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+
+    position: absolute;
+    padding: 40px;
+    background-color: #EEEFF1;
+    border-radius: 5px;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+}
+
+.login {
+    display: flex;
+    flex-direction: column;
+}
+
+.login_id {
+    padding: 6px 10px;
+}
+
+.login_pwd {
+    padding: 6px 10px;
+}
+
+.find {
+    display: flex;
+    list-style: none;
+}
+
+.find li {
+    padding: 0px 10px;
+    border-right: 1px solid var(--gray-color);
+}
+
+.kakao_login {
+    display: flex;
+}

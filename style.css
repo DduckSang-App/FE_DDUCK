@@ -1,4 +1,7 @@
 :root {
+    --black-color: black;
+    --white-color: whitesmoke;
+    --gray-color: #aca3a3;
     --red-color: #fc2f2f;
     --blue-color: #389cf9;
     --yellow-color: gold;
@@ -9,20 +12,19 @@
 body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
-    border-bottom: 1px solid black !important;
+    border-bottom: 1px solid var(--black-color) !important;
 }
 
 a {
-    
     text-decoration: none;
-    color:black;
+    color:var(--black-color);
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: whitesmoke;
+    background-color: var(--white-color);
     
     padding: 6px 20px;
 }
@@ -49,7 +51,7 @@ a {
 }
 
 .navbar_menu li:hover {
-    background-color: #aca3a3;;
+    background-color: var(--gray-color);
     border-radius: 4px;
 }
 
@@ -90,7 +92,7 @@ a {
 }
 
 .navbar_login li:hover {
-    background-color: #aca3a3;
+    background-color: var(--gray-color);
     border-radius: 4px;
 }
 
