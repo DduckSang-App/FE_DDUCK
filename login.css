@@ -1,66 +1,75 @@
-:root {
-    --black-color: black;
-    --white-color: whitesmoke;
-    --gray-color: #aca3a3;
-    --red-color: #fc2f2f;
-    --blue-color: #389cf9;
-    --yellow-color: gold;
-    --navy-color: #263343;
-    --orange-color: #d49466;
-}
-
-body {
-    font-family: 'Noto Sans KR', sans-serif;
+* {
+    padding: 0;
     margin: 0;
 }
 
-a {
-    text-decoration: none;
-    color:var(--black-color);
+body {
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-.title {
-    margin: 16px;
-}
-
-.login_form {
-    display: flex;
-    flex-direction: column;
-    align-items:center;
-
+.login_wrap {
     position: absolute;
+    text-align: center;
+    top: 20%;
+    left: 40%;
+    width: 450px;
+    height: 450px;
     padding: 40px;
-    background-color: #EEEFF1;
+    box-sizing: border-box;
+    transform: translate(-50% -50%);
+    border: 1px solid #dadada;
     border-radius: 5px;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
 }
 
-.login {
-    display: flex;
-    flex-direction: column;
+.login_wrap > h2 {
+    font-size: 20px;
+    color: #6A24FE;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.login_id {
-    padding: 6px 10px;
+.logo {
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
 }
 
-.login_pwd {
-    padding: 6px 10px;
+
+#login_form > input {
+    width: 100%;
+    height: 48px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #dadada;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    background-color: #F8F8F8;
+    cursor: pointer;
 }
 
-.find {
-    display: flex;
-    list-style: none;
+#login_form > input[type="submit"] {
+    color : #fff;
+    font-size: 16px;
+    background-color: #6A24FE;
+    margin-top: 20px;
 }
 
-.find li {
-    padding: 0px 10px;
-    border-right: 1px solid var(--gray-color);
+#login_form > input[type="checkbox"] {
+    display: none;
+}
+
+#login_form > label {
+    color: #999999;
+    cursor: pointer;
 }
 
 .kakao_login {
-    display: flex;
+    width: 60%;
+    height: 40px;
+    border: 1px solid #dadada;
+    border-radius: 6px;
+    background-color: gold;
+    cursor: pointer;
 }
