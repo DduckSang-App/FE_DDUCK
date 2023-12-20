@@ -65,11 +65,7 @@ body {
     cursor: pointer;
 }
 
-.kakao_login {
-    width: 60%;
-    height: 40px;
-    border: 1px solid #dadada;
-    border-radius: 6px;
-    background-color: gold;
+#kakao-login-btn {
+    border: none;
     cursor: pointer;
 }
