@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/967b5a4a71.js" 
+    crossorigin="anonymous"></script>
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js"
     integrity="sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8" crossorigin="anonymous"></script>
     <script>Kakao.init('459b020ef210fc432886e6e1ce2d7395'); // 사용하려는 앱의 JavaScript 키 입력
@@ -15,10 +17,15 @@
     <title>오늘의 아파트 : 로그인</title>
 </head>
 <body>
+    <div class="main">
+        <i class="fa-regular fa-building"></i>
+        <a href="index.html" class="main_title">오늘의 아파트</a>
+    </div>
+
     <div class="login_wrap"> 
-        <a href="index.html" class="logo"><h1>오늘의 아파트</h1></a>
-        <h2>ID 로그인</h2>
-        <form id="login_form">
+        
+        <h2><i class="fa-solid fa-arrow-right-to-bracket"></i>ID 로그인</h2>
+        <form method="get" action="#" id="login_form">
             <input type="text" minlength="6" placeholder="아이디">
             <input type="password" minlength="8" placeholder="비밀번호">
             <label for="remember_id"><input type="checkbox" id="remember_id">아이디 저장</label>
@@ -27,19 +34,20 @@
 
 
         <a id="kakao-login-btn" href="javascript:loginWithKakao()">
-            <img src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg" width="222"
+            <img src="kakao_login_medium_wide.png" width="100%"
               alt="카카오 로그인 버튼" />
         </a>
         <p id="token-result"></p>
 
-        <!-- <div class="login_btn">
-            <button class="kakao_login" onClick="확인">
-                <img src="kakao_login/ko/kakao_login_medium_wide.png" width="222" alt="카카오 로그인 버튼"/>
-            </button>
-        </div> -->
+        <ul class="find_wrap">
+            <li><a href="#">아이디 찾기</a></li>
+            <li><a href="#">비밀번호 찾기</a></li>
+            <li><a href="#">회원가입</a></li>
+        </ul>
 
-        
     </div>
+
+    
 
 </body>
 </html>

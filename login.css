@@ -1,3 +1,13 @@
+:root {
+    --black-color: black;
+    --white-color: #fff;
+    --gray-color: #dadada;
+    --purple-color: #6A24FE;
+    --orange-color: #d49466;
+    --id_pwd-color: #F8F8F8;
+    --checkbox-color: #999999;
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -6,6 +16,14 @@
 body {
     font-size: 14px;
     font-family: 'Noto Sans KR', sans-serif;
+}
+
+ul {
+    list-style: none;
+}
+
+i {
+    margin-right: 8px;
 }
 
 .login_wrap {
@@ -18,54 +36,91 @@ body {
     padding: 40px;
     box-sizing: border-box;
     transform: translate(-50% -50%);
-    border: 1px solid #dadada;
+    border: 1px solid var(--gray-color);
     border-radius: 5px;
 }
 
 .login_wrap > h2 {
+    position: relative;
+    right: 35%;
     font-size: 20px;
-    color: #6A24FE;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
-.logo {
-    font-size: 18px;
-    text-align: center;
+.login_wrap i {
+    color: var(--orange-color);
+}
+
+.main {
+    position: absolute;
+    top: 12%;
+    left: 46%;
+    font-size: 30px;
+    padding: 10px;
+    color: var(--orange-color);
+}
+
+.main_title {
     text-decoration: none;
-    color: black;
+    color: var(--black-color);
 }
-
 
 #login_form > input {
     width: 100%;
-    height: 48px;
+    height: 55px;
     padding: 0 10px;
     box-sizing: border-box;
-    border: 1px solid #dadada;
+    border: 1px solid var(--gray-color);
     margin-bottom: 16px;
     border-radius: 6px;
-    background-color: #F8F8F8;
+    background-color: var(--id_pwd-color);
     cursor: pointer;
 }
 
 #login_form > input[type="submit"] {
-    color : #fff;
+    color : var(--white-color);
     font-size: 16px;
-    background-color: #6A24FE;
-    margin-top: 20px;
+    background-color: var(--purple-color);
+    margin-top: 40px;
+    border-radius: 12px;
 }
 
-#login_form > input[type="checkbox"] {
-    display: none;
+#login_form input[type="checkbox"] {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    top: 2.5px;
+    margin-right: 5px;
 }
 
 #login_form > label {
-    color: #999999;
+    position: relative;
+    color: var(--checkbox-color);
     cursor: pointer;
+    right: 38%;
 }
 
 #kakao-login-btn {
-    border: none;
     cursor: pointer;
+}
+
+img {
+    border-radius: 12px;
+}
+
+.find_wrap {
+    display: flex;
+    padding: 35px 0;
+    justify-content: space-around;
+}
+
+.find_wrap a {
+    text-decoration: none;
+    color: var(--checkbox-color);
+    padding: 8px 10px;
+}
+
+.find_wrap li:hover {
+    background-color: var(--gray-color);
+    border-radius: 4px;
 }
