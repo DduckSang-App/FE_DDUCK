@@ -9,6 +9,8 @@
     --orange-color: #d49466;
 }
 
+/* ###메인화면 css### */
+
 body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
@@ -103,10 +105,41 @@ a {
     color:var(--orange-color)
 }
 
-#map {
-    margin: auto !important;
+
+/* 확대, 축소 버튼 */
+.custom_zoomcontrol_btn {
+    position:absolute;
+    top:100px;
+    right:20px;
+    width:46px;
+    height:100px;
+    overflow:hidden;
+    z-index: 1;
+    background-color: var(--white-color);
+    border: 1px solid var(--gray-color);
+    border-radius: 4px;
+} 
+
+.custom_zoomcontrol_btn span {
+    display:block;
+    width:46px;
+    height:50px;
+    text-align:center;
+    cursor:pointer;
 }
 
+.custom_zoomcontrol_btn span i {
+    font-size: 22px;
+    width:25px;
+    height:25px;
+    padding:12px 0;
+}             
+
+.custom_zoomcontrol_btn span:first-child {
+    border-bottom:1px solid var(--gray-color);
+}  
+
+/* 화면 크기 줄였을 때 */
 @media(max-width:770px){
     .navbar {
         flex-direction: column;
@@ -145,4 +178,65 @@ a {
     .navbar_login.active {
         display: flex;
     }
+}
+
+/* ###검색창 css### */
+.input-wrap {
+    position: absolute;
+    display: inline-flex;
+    border: 3px solid #6A24FE;
+    border-radius: 3px;
+    height: 2em;
+    width: 320px;    
+    top: 11%;
+    left: 1%;
+    z-index: 2;
+}
+
+/* input 창 */
+input[type=text] {
+    padding: 0 10px;
+    background-color: #fff;
+    width: 100%;
+    border: none;
+    /* input 테두리 없애기 */
+    outline: none;
+}
+
+/* X 버튼 */
+.input-wrap .btn-clear {
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    background: rgb(255,255,255);
+    visibility: hidden;    
+}
+
+/* 검색 버튼 */
+.input-wrap .btn-search {
+    background-color: #6A24FE;
+    color: var(--white-color);
+    font-weight: bold;
+    border: none;
+    border-left: 3px solid #6A24FE;
+    cursor: pointer;
+}
+
+/* 검색 결과 목록 */
+#addressList {
+    position: absolute;
+    width: 295px;
+    margin: 0;
+    top: 15.1%;
+    left: 1%;
+    padding-left: 10px;
+    background-color: var(--white-color);
+    border: 1px solid gray;
+    border-radius: 5px;
+    overflow-y: auto;
+    max-height: 400px;
+    line-height: 2em;
+    box-sizing: border-box;
+    visibility: hidden;
+    z-index: 2;
 }

@@ -11,8 +11,9 @@
         </script>
         <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=459b020ef210fc432886e6e1ce2d7395&libraries=clusterer"></script>
-        <script src="map.js" defer></script>
         <script src="main.js" defer></script>
+        <script src="map.js" defer></script>
+        <script src="address.js" defer></script>
         <title>오늘의 아파트</title>
     </head>
 
@@ -40,9 +41,30 @@
             </a>
         </nav>
 
-        <!--지도 표시할 div / KAKAO MAP API-->
-        <div id="map" style="width:100%;height:790px;"></div>
+        <!-- 검색창 -->
+        <div class="input-wrap">
+            <input type="text" name="SiGunGu" id="addressInput" 
+            onkeyup="search(event)" placeholder="주소를 입력하세요">
+            <button class="btn-clear" onclick="del()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="btn-search" onclick="find()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
         
+        <div id="addressList"></div>
+
+        
+        <div class="map_wrap">
+            <!--지도 표시할 div / KAKAO MAP API-->
+            <div id="map" style="width:100%;height:790px;"></div>
+            
+            <!--지도 확대, 축소 컨트롤 div-->
+            <div class="custom_zoomcontrol_btn">
+                <span onclick="zoomIn()"><i class="fa-solid fa-plus"></i></span>
+                <span onclick="zoomOut()"><i class="fa-solid fa-minus"></i></span>
+            </div>
+
+
+        </div>
+            
 
     </body>
 </html>
