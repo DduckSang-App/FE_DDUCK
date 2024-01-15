@@ -48,6 +48,7 @@ function search(target) {
                    
                 });
 
+                // 검색 결과 없을 때
                 if (arg == "" && data2 == ""){
                     const noResult = document.createElement("div");
                     noResult.insertAdjacentHTML('beforeend',`<div class='no-result' style='font-size: 12px;'>검색 결과가 없습니다.</div>`)
