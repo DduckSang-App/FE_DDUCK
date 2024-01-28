@@ -230,7 +230,7 @@ input[type=text] {
     top: 15.1%;
     left: 1%;
     padding-left: 10px;
-    background-color: var(--white-color);
+    background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid gray;
     border-radius: 5px;
     overflow-y: auto;
@@ -239,4 +239,93 @@ input[type=text] {
     box-sizing: border-box;
     visibility: hidden;
     z-index: 2;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+}
+
+.info-container {
+    display: none;
+}
+
+.aptInfo-wrap {
+    position: absolute;
+    background-color: #fff;
+    top:145px;
+    left: 77%;
+    width:100;
+    height:700px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid grey;
+    z-index: 1;
+}
+
+#aptInfo-items {
+    background: right / cover url("https://ic.zigbang.com/vp/BigData/33323/044b64b3d595af5896516858fa3f9c02692789e5.jpg?w=750&q=80&a=1");
+    display: flex;
+    align-items: end;
+    width: 400px;
+    height: 250px;
+}
+
+/* 매매 정보*/
+.salesInfo {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+    border-bottom: 1px solid grey;
+}
+
+.salesInfo > div {
+    padding-right: 5px;
+    border-right: 1px solid grey;
+}
+
+#salesDate {
+    width:115px;
+}
+
+#salesPrice {
+    padding-right: 10px;
+    width: 100px;
+}
+
+#salesArea {
+    
+    width: 70px;
+}
+
+#salesFloor {
+    padding-right: 15px;
+}
+
+/* 매매 목록 */
+#salesList > li {
+    display: flex;
+    padding-right: 10px;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.date {
+    width: 120px;
+}
+
+.price {
+    padding-right: 15px;
+    width: 100px;
+}
+
+.area {
+    margin-right: 15px;
+    padding-left: 5px;
+    padding-bottom: 5px;
 }
