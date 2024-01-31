@@ -25,6 +25,18 @@ var map = new kakao.maps.Map(mapContainer, mapOption);
 // 장소 검색 객체를 생성합니다
 var ps = new kakao.maps.services.Places(); 
 
+// 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+function zoomIn() {
+    map.setLevel(map.getLevel() - 1);
+}
+
+// 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+function zoomOut() {
+    if(map.getLevel() + 1 < 14){
+        map.setLevel(map.getLevel() + 1);
+    }
+
+}
 
 // 검색
 function search(target) {
