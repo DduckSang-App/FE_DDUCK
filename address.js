@@ -1,3 +1,15 @@
+// 마커를 담을 배열입니다
+var markers = [],
+
+    // 매매 데이터를 저장할 변수입니다
+    sales = "",
+
+    // 아파트 준공일을 저장할 변수입니다
+    buildYear = "",
+
+    // 매매 평균가 및 상승률/하락률을 저장할 배열입니다
+    avgSales = [];
+
 // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
 var infowindow = new kakao.maps.InfoWindow({zIndex:1});
 
@@ -14,28 +26,6 @@ var map = new kakao.maps.Map(mapContainer, mapOption);
 var ps = new kakao.maps.services.Places(); 
 
 
-// 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
-function zoomIn() {
-    map.setLevel(map.getLevel() - 1);
-}
-
-// 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
-function zoomOut() {
-    if(map.getLevel() + 1 < 14){
-        map.setLevel(map.getLevel() + 1);
-    }
-    
-}
-
-// 마커를 담을 배열입니다
-var markers = [];
-
-// 매매 데이터를 저장할 변수입니다
-var sales = "";
-
-// 아파트 입주일을 저장할 변수입니다
-var buildYear = "";
-
 // 검색
 function search(target) {
     if(!KeyboardEvent.isComposing) {
@@ -45,7 +35,6 @@ function search(target) {
             url: "http://ec2-15-164-32-179.ap-northeast-2.compute.amazonaws.com:8080/searchAddress",
             data: JSON.stringify({SiGunGu: $("#addressInput").val()}),
             dataType:'json',
-            // timeout: 10000,
             success: function(data) {
                 var addressList = document.getElementById("addressList"),
                     fragment = document.createDocumentFragment();
@@ -95,10 +84,9 @@ function salesData(data) {
                 endDate: "202312"
             }),
             dataType: "json",
-            timeout: 500,
             success: function(apts) {
                 var inputText = document.getElementById("addressInput").value;
-
+                
                 for(var i=0; i<apts.length; i++) {
                     if(apts[i].aptName === inputText) {
 
@@ -108,8 +96,11 @@ function salesData(data) {
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
                         
-                        // 아파트 입주일을 저장합니다
+                        // 아파트 준공일을 저장합니다
                         buildYear = apts[i].buildYear;
+
+                        // 매매 평균가를 저장합니다
+                        avgSales.push(apts[i].prevAverage, apts[i].nowAverage, apts[i].upDownPercent);
 
                         // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
                         ps.keywordSearch(jibun, placesSearchCB);
@@ -149,7 +140,7 @@ function find() {
         located_name = document.querySelector('.located-name'),
         inputText = document.getElementById("addressInput"),
         hideList = document.getElementById("addressList");
-        
+
     // 검색 결과가 있는 경우에만 실행
     // 일치하는 값이 없는 경우는 apt_name의 값은 null임
     // 위의 search함수에서 data 값과는 다름
@@ -215,9 +206,9 @@ function placesSearchCB (data, status, pagination) {
 
 function displayApts(apts) {
     var bounds = new kakao.maps.LatLngBounds(),
-        fragment = document.createDocumentFragment(),
         aptInfo = document.getElementById("aptInfo-items"),
-        salesList = document.getElementById("salesList");
+        salesList = document.getElementById("salesList"),
+        avgList = document.getElementById("avgList");
 
     // 지도에 표시되고 있는 마커를 제거합니다
     removeMarker();
@@ -228,20 +219,24 @@ function displayApts(apts) {
     // 매매 검색 결과 목록에 추가된 항목들을 제거합니다
     removeAllChildNods(salesList);
 
-    for(var i=0; i<apts.length; i++){
+    // 매매 평균가 정보를 제거합니다
+    removeAllChildNods(avgList);
 
+    for(var i=0; i<apts.length; i++){
+        
         // 주거시설이 아파트인 곳만 지도에 표시
-        if(apts[i].category_name === "부동산 > 주거시설 > 아파트") {
-            
+        if(apts[i].category_name.match(/주거시설/)) {
             
             // 마커를 생성하고 지도 위에 표시합니다
             var aptPosition = new kakao.maps.LatLng(apts[i].y, apts[i].x),
                 marker = addMarker(aptPosition, i),
                 aptItems = getAptInfo(apts[i].place_name, buildYear),
+                avgItems = getAvgInfo(avgSales),
                 saleItems = "";
-
+            
             if(Array.isArray(sales) && !sales.length) {
-                console.log("12월 거래 없음");
+                saleItems = getSalesInfo(sales);
+                salesList.appendChild(saleItems);
             }
 
             else {
@@ -249,9 +244,10 @@ function displayApts(apts) {
                     saleItems = getSalesInfo(saleLists);
                     salesList.appendChild(saleItems);
                 });
-                    
-                aptInfo.appendChild(aptItems);
             }
+
+            aptInfo.appendChild(aptItems);
+            avgList.appendChild(avgItems);
             
             // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
             // LatLngBounds 객체에 좌표를 추가합니다
@@ -274,6 +270,9 @@ function displayApts(apts) {
             break;
         }
     }
+
+    // 매매 평균가를 담은 배열을 초기화시킵니다
+    avgSales = [];
 
     // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
     map.setBounds(bounds);
@@ -343,7 +342,7 @@ function removeAllChildNods(el) {
     }
 }
 
-// 아파트 이름과 층 정보를 나타내는 함수입니다.
+// 아파트 이름과 층 정보를 반환하는 함수입니다.
 function getAptInfo(title, year) {
 
     var el = document.createElement('li'),
@@ -351,7 +350,7 @@ function getAptInfo(title, year) {
     
          // 아파트 이름과 층 정보
         aptName = '<div class="name" style="font-size:27px;padding-left:10px;color:#fff;">' + 
-                    title.slice(0,-3) + '</div>' + 
+                    title.replace(/아파트$/, "") + '</div>' + 
                     '<span class="buildYear" style="padding-left:14px;color:#fff;">' + year + 
                     '년' + ' 준공' + '</span>';
         
@@ -362,29 +361,80 @@ function getAptInfo(title, year) {
     return fragment;
 }
 
+// 매매 정보를 반환하는 함수입니다
 function getSalesInfo(tmp) {
     var el = document.createElement('li'),
         fragment = document.createDocumentFragment(),
-        
-        // 매매일 정보
-        year = tmp.salesDate.split('-')[0].slice(-2) + '.',
-        month = tmp.salesDate.split('-')[1] + '.',
-        day = tmp.salesDate.split('-')[2],
+        itemStr = "";
 
-        // 매매가 정보
-        million = Math.floor(tmp.amount/10000),
-        tmpPrice = tmp.amount%10000,
-        thousand = (tmpPrice > 0) ? tmpPrice.toLocaleString("ko-KR") : "",
-        area = Math.floor(tmp.dedicatedArea),
+    if(Array.isArray(tmp) && !tmp.length) {
+        itemStr = '<div class="no-result" style="padding: 10px 0;color:#be0000;">' + "당월 매매 기록이 없습니다." + '</div>';
+    }
         
-        itemStr = '<div class="date" >' + year + month + day + '</div>' +
-                    '<div class="price">' + million + '억 ' + thousand + '</div>' +
+    else {
+        // 매매일 정보
+        var year = tmp.salesDate.split('-')[0].slice(-2) + '.',
+            month = tmp.salesDate.split('-')[1] + '.',
+            day = tmp.salesDate.split('-')[2],
+
+            // 매매가 정보
+            hundredM = (Math.floor(tmp.amount/10000) > 0) ? Math.floor(tmp.amount/10000).toString() + "억 " : "",
+            tmpPrice = tmp.amount%10000,
+            tenM = (tmpPrice > 0) ? tmpPrice.toLocaleString("ko-KR") : "",
+            area = Math.floor(tmp.dedicatedArea);
+            
+        itemStr = '<div class="date">' + year + month + day + '</div>' +
+                    '<div class="price">' + hundredM + tenM + '</div>' +
                     '<div class="area">' + area + 'm<sup>2' + '</sup>' + '</div>' +
                     '<div class="floor" sytle="padding-left:15px;">' + tmp.floor + '층' + '</div>';
+    }
 
-        el.innerHTML = itemStr;
-        el.className = 'saleItem';
-        fragment.appendChild(el)
+    el.innerHTML = itemStr;
+    el.className = 'saleItem';
+    fragment.appendChild(el);
         
-        return fragment;
+    return fragment;
+}
+
+function getAvgInfo(tmp) {
+    var el = document.createElement('li'),
+        fragment = document.createDocumentFragment(),
+        itemStr = '<div class="last">';
+
+    if(tmp[0]) {
+        var lastHundred = (Math.floor(tmp[0]/10000) > 0) ? Math.floor(tmp[0]/10000).toString() + "억 " : "",
+            lastTen = (tmp[0]%10000 > 0) ? (tmp[0]%10000).toLocaleString("ko-KR") : "",
+            last = lastHundred + lastTen;
+
+        itemStr += last + '</div>';
+    }
+    else {
+        itemStr += "-----" + '</div>';
+    }   
+
+    if(tmp[1]) {
+        var nowHundred = (Math.floor(tmp[1]/10000) > 0) ? Math.floor(tmp[1]/10000).toString() + "억 " : "",
+            nowTen = (tmp[1]%10000 > 0) ? (tmp[1]%10000).toLocaleString("ko-KR") : "",
+            now = nowHundred + nowTen;
+        
+            itemStr += '<div class="now">' + now + '</div>';
+    }
+    else {
+        itemStr += '<div class="now">' + "-----" + '</div>';
+    }
+        
+    if(tmp[2]) {
+        var upDown = Math.round(tmp[2]*10000) / 100;
+
+        itemStr += '<div class="upDown">' + upDown + '%' + '</div>';
+    }
+    else {
+        itemStr += '<div class="upDown">' + '-----' + '</div>';
+    }
+
+    el.innerHTML = itemStr;
+    el.className = 'avgItem';
+    fragment.appendChild(el);
+
+    return fragment
 }

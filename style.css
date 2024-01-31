@@ -275,57 +275,79 @@ li {
     height: 250px;
 }
 
+/* 매매 평균가 정보 */
+.avgInfo {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid gainsboro;
+    padding: 0 15px;
+}
+
+
+#avgList {
+    padding: 15px 0;
+    border-bottom: 1px solid gainsboro;
+}
+
+#avgList > li {
+    display: flex;
+    justify-content:space-between;
+    padding: 0 20px;
+}
+
+
 /* 매매 정보*/
 .salesInfo {
     display: flex;
-    justify-content: space-between;
-    text-align: center;
-    border-bottom: 1px solid grey;
+    justify-content: space-around;
+    border-bottom: 1px solid gainsboro;
 }
 
 .salesInfo > div {
-    padding-right: 5px;
-    border-right: 1px solid grey;
+    text-align: center;
 }
 
 #salesDate {
-    width:115px;
+    width: 100px;
 }
 
 #salesPrice {
-    padding-right: 10px;
+    padding-right: 20px;
     width: 100px;
 }
 
 #salesArea {
-    
+    padding-right: 25px;
     width: 70px;
 }
 
 #salesFloor {
-    padding-right: 15px;
+    padding-right: 4px;
 }
 
 /* 매매 목록 */
 #salesList > li {
     display: flex;
-    padding-right: 10px;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-around;
     text-align: center;
+    padding: 5px 0;
 }
 
 .date {
-    width: 120px;
+    width: 100px;
+    padding-top: 4px;
 }
 
 .price {
-    padding-right: 15px;
-    width: 100px;
+    width: 120px;
+    padding-top: 4px;
 }
 
 .area {
-    margin-right: 15px;
-    padding-left: 5px;
-    padding-bottom: 5px;
+    width: 100px;
+}
+
+.floor {
+    padding-top: 4px;
+    padding-right: 5px;
 }
