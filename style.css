@@ -27,8 +27,8 @@ a {
     justify-content: space-between;
     align-items: center;
     background-color: var(--white-color);
-    
     padding: 6px 20px;
+    
 }
 
 .navbar_logo {
@@ -109,10 +109,10 @@ a {
 /* 확대, 축소 버튼 */
 .custom_zoomcontrol_btn {
     position:absolute;
-    top:100px;
-    right:20px;
-    width:46px;
-    height:100px;
+    top: 95px;
+    left: 350px;
+    width:31px;
+    height:68px;
     overflow:hidden;
     z-index: 1;
     background-color: var(--white-color);
@@ -121,64 +121,22 @@ a {
 } 
 
 .custom_zoomcontrol_btn span {
-    display:block;
-    width:46px;
-    height:50px;
+    display: block;
+    width: 31px;
+    height: 33px;
     text-align:center;
     cursor:pointer;
+    box-sizing: border-box;
 }
 
 .custom_zoomcontrol_btn span i {
     font-size: 22px;
-    width:25px;
-    height:25px;
-    padding:12px 0;
+    padding: 6px 0;
 }             
 
 .custom_zoomcontrol_btn span:first-child {
     border-bottom:1px solid var(--gray-color);
 }  
-
-/* 화면 크기 줄였을 때 */
-@media(max-width:770px){
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 6px 10px;
-    }
-
-    .navbar_menu {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-
-    .navbar_menu li {
-        width: 100%;
-        text-align: center;
-    }
-    
-    .navbar_login {
-        display: none;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .navbar_login li {
-        width: 100%;
-        text-align: center;
-    }
-
-    .toggleBtn {
-        display: block;
-    }
-
-    .navbar_menu.active,
-    .navbar_login.active {
-        display: flex;
-    }
-}
 
 /* ###검색창 css### */
 .input-wrap {
@@ -188,8 +146,8 @@ a {
     border-radius: 3px;
     height: 2em;
     width: 320px;    
-    top: 11%;
-    left: 1%;
+    top: 95px;
+    left: 15px;
     z-index: 2;
 }
 
@@ -199,8 +157,7 @@ input[type=text] {
     background-color: #fff;
     width: 100%;
     border: none;
-    /* input 테두리 없애기 */
-    outline: none;
+    outline: none;  /* input 테두리 없애기 */
 }
 
 /* X 버튼 */
@@ -209,7 +166,10 @@ input[type=text] {
     cursor: pointer;
     font-size: 15px;
     background: rgb(255,255,255);
-    visibility: hidden;    
+}
+
+.input-wrap .btn-clear > i {
+    visibility: hidden;
 }
 
 /* 검색 버튼 */
@@ -241,6 +201,7 @@ input[type=text] {
     z-index: 2;
 }
 
+/* 매매 데이터 */
 ul {
     margin: 0;
     padding: 0;
@@ -252,15 +213,18 @@ li {
 
 .info-container {
     display: none;
+    /* width: 1450px; */
 }
 
+/* 매매 데이터 화면 */
 .aptInfo-wrap {
+    display: flex;
     position: absolute;
     background-color: #fff;
-    top:145px;
-    left: 77%;
-    width:100;
-    height:700px;
+    top: 6.3%;
+    left: 1343.5px;
+    /* width: 400px; */
+    height: 812.5px;
     display: flex;
     flex-direction: column;
     border: 1px solid grey;

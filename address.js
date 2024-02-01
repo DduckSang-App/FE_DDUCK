@@ -35,7 +35,6 @@ function zoomOut() {
     if(map.getLevel() + 1 < 14){
         map.setLevel(map.getLevel() + 1);
     }
-
 }
 
 // 검색
@@ -81,7 +80,6 @@ function search(target) {
         });
     }
 }
-
 
 // 아파트 매매 정보
 function salesData(data) {
@@ -170,23 +168,26 @@ function find() {
 // 검색창 X버튼 클릭했을 때
 function del() {
     var addressList = document.getElementById("addressList"),
-        addressInput = document.getElementById("addressInput");
+        addressInput = document.getElementById("addressInput"),
+        clearBtn = document.querySelector(".btn-clear > i");
     
     addressList.value = "";
     addressInput.value = "";
-    $('.btn-clear').css("visibility", "hidden");
+    clearBtn.style.visibility = "hidden";
     
-    if (addressList.style.visibility == 'visible') {
-        addressList.style.visibility = 'hidden';
+    if (addressList.style.visibility == "visible") {
+        addressList.style.visibility = "hidden";
     }
 }
 
 
 // 검색할 때만 검색 목록 표시
 function listVisibility(target, e){
+    var clearBtn = document.querySelector(".btn-clear > i");
+
     if(target && e.isComposing){
         target.style.visibility = "visible";
-        $('.btn-clear').css("visibility", "visible");
+        clearBtn.style.visibility = "visible";
     }
 }
 
@@ -218,6 +219,7 @@ function placesSearchCB (data, status, pagination) {
 
 function displayApts(apts) {
     var bounds = new kakao.maps.LatLngBounds(),
+        fragment = document.createDocumentFragment(),
         aptInfo = document.getElementById("aptInfo-items"),
         salesList = document.getElementById("salesList"),
         avgList = document.getElementById("avgList");
@@ -235,7 +237,7 @@ function displayApts(apts) {
     removeAllChildNods(avgList);
 
     for(var i=0; i<apts.length; i++){
-        
+        console.log(apts[i]);
         // 주거시설이 아파트인 곳만 지도에 표시
         if(apts[i].category_name.match(/주거시설/)) {
             
