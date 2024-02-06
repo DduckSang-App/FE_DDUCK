@@ -66,4 +66,4 @@ body
 
 2. 한글 입력으로 이벤트가 2번 호출되는 경우
    - 한글의 특성으로 인해 글자가 조합중인지, 조합이 끝난 상태인지를 알 수 없기 때문에 발생한다.
-   - KeyboardEvent.isComposing이 true일 때는 실행 안 되도록 작성하면 된다.
+   - KeyboardEvent.isComposing이 true일 때는 실행되지 않도록 한다.
