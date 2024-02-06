@@ -8,7 +8,11 @@ var markers = [],
     buildYear = "",
 
     // 매매 평균가 및 상승률/하락률을 저장할 배열입니다
-    avgSales = [];
+    avgSales = [],
+
+    // input 값이 달라질 때 아파트 리스트 목록의 idx를 초기화하고 이전 idx를 저장합니다.
+    idx = -1,
+    prevIdx;
 
 // 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
 var infowindow = new kakao.maps.InfoWindow({zIndex:1});
@@ -39,90 +43,139 @@ function zoomOut() {
 
 // 검색
 function search(target) {
-    if(!KeyboardEvent.isComposing) {
-        $.ajax({
-            type: "POST",
-            contentType : 'application/json',
-            url: "http://ec2-15-164-32-179.ap-northeast-2.compute.amazonaws.com:8080/searchAddress",
-            data: JSON.stringify({SiGunGu: $("#addressInput").val()}),
-            dataType:'json',
-            success: function(data) {
+    var addressInput = document.getElementById("addressInput");
+
+    if(target.isComposing || target.keyCode == 8){
+        setTimeout(() => {
+            if(!addressInput.value){
                 var addressList = document.getElementById("addressList"),
-                    fragment = document.createDocumentFragment();
+                    clearBtn = document.querySelector(".btn-clear > i");
                 
-                // 검색 결과 목록에 추가된 것들을 제거합니다
-                removeAllChildNods(addressList);
+                addressList.style.visibility = "hidden";
+                clearBtn.style.visibility = "hidden";
 
-                // 검색창에 입력이 되었을 때 검색 목록이 보입니다
-                listVisibility(addressList, target);                
-                
-                // 검색 결과 없을 때 검색 결과가 없다고 나타냅니다
-                if(data == "") {
-                    var noResult = document.createElement("div");
-                    noResult.insertAdjacentHTML('beforeend',`<div class='no-result' style='font-size: 12px;'>검색 결과가 없습니다.</div>`)
-                    fragment.append(noResult);
-                }
-
-                // 지역 및 아파트 검색 결과 있을 때 
-                for(var i=0; i<data.length; i++) {
-                    var itemEl = getListItem(data[i]);
-                    fragment.append(itemEl);
-                }
-                
-                addressList.append(fragment);
-
-                enterKey(target);             
-            },
-            fail: function(data) {
-                console.log(data.responseText);
-                fail(error);
+                return;
             }
-        });
+
+            $.ajax({
+                type: "POST",
+                contentType : 'application/json',
+                url: "http://ec2-15-164-32-179.ap-northeast-2.compute.amazonaws.com:8080/searchAddress",
+                data: JSON.stringify({SiGunGu: addressInput.value}),
+                dataType:'json',
+                success: function(data) {
+                    var addressList = document.getElementById("addressList"),
+                        fragment = document.createDocumentFragment();
+
+                    // 검색 결과 목록에 추가된 것들을 제거합니다
+                    removeAllChildNods(addressList);
+    
+                    // 검색창에 입력이 되었을 때 검색 목록이 보입니다
+                    listVisibility(addressList, target);                
+                    
+                    // 검색 결과 없을 때 검색 결과가 없다고 나타냅니다
+                    if(data == "") {
+                        var noResult = document.createElement("div");
+                        noResult.insertAdjacentHTML('beforeend',`<div class='no-result' style='font-size: 12px;'>검색 결과가 없습니다.</div>`)
+                        fragment.append(noResult);
+                    }
+    
+                    // 지역 및 아파트 검색 결과 있을 때 
+                    for(var i=0; i<data.length; i++) {
+                        var itemEl = getListItem(data[i]);
+                        fragment.append(itemEl);
+                    }
+                    
+                    addressList.append(fragment);         
+                },
+                fail: function(data) {
+                    console.log(data.responseText);
+                    fail(error);
+                }
+            });
+            idx = -1;
+        }, 300);
     }
+
+    if(!target.isComposing){ keyboardHandle(target); }
+}
+
+// 검색 목록 방향키로 이동
+function keyboardHandle(target) {
+    var listItems = document.getElementsByClassName("info");
+    
+    if(target.keyCode == 40 && target.key == 'ArrowDown') {
+        prevIdx = idx;
+        idx++;
+        
+        if(idx >= listItems.length) {
+            idx = prevIdx;
+            return;
+        }
+
+        listItems[idx].classList.add("selected");
+        
+        if(prevIdx >= 0 ) {
+            listItems[prevIdx].classList.remove("selected");
+        }
+    }
+
+    else if(target.keyCode == 38 && target.key == 'ArrowUp') {
+        prevIdx = idx;
+        idx--;
+        
+        if(idx < 0) {
+            idx = 0;
+            return;
+        }
+
+        listItems[idx].classList.add("selected");
+        listItems[prevIdx].classList.remove("selected");
+    }
+    
+    if (target.keyCode == 13 && target.key == 'Enter') { find(idx); }
 }
 
 // 아파트 매매 정보
 function salesData(data) {
-    if(!KeyboardEvent.isComposing) {
-        $.ajax({
-            type: "POST",
-            contentType: "application/json",
-            url: "http://ec2-15-164-32-179.ap-northeast-2.compute.amazonaws.com:8080/InfoBuilding",
-            data: JSON.stringify({
-                SiGunGu: data,
-                startDate: "202311",
-                endDate: "202312"
-            }),
-            dataType: "json",
-            success: function(apts) {
-                var inputText = document.getElementById("addressInput").value;
-                
-                for(var i=0; i<apts.length; i++) {
-                    if(apts[i].aptName === inputText) {
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "http://ec2-15-164-32-179.ap-northeast-2.compute.amazonaws.com:8080/InfoBuilding",
+        data: JSON.stringify({
+            SiGunGu: data,
+            startDate: "202311",
+            endDate: "202312"
+        }),
+        dataType: "json",
+        success: function(apts) {
+            var inputText = document.getElementById("addressInput").value;
+            
+            for(var i=0; i<apts.length; i++) {
+                if(apts[i].aptName === inputText) {
 
-                        // 지번을 저장합니다
-                        var jibun = data + apts[i].bonBun_BuBun;
+                    // 지번을 저장합니다
+                    var jibun = data + apts[i].bonBun_BuBun;
 
-                        // 매매 데이터를 저장합니다
-                        sales = apts[i].salesList;
-                        
-                        // 아파트 준공일을 저장합니다
-                        buildYear = apts[i].buildYear;
+                    // 매매 데이터를 저장합니다
+                    sales = apts[i].salesList;
+                    
+                    // 아파트 준공일을 저장합니다
+                    buildYear = apts[i].buildYear;
 
-                        // 매매 평균가를 저장합니다
-                        avgSales.push(apts[i].prevAverage, apts[i].nowAverage, apts[i].upDownPercent);
+                    // 매매 평균가를 저장합니다
+                    avgSales.push(apts[i].prevAverage, apts[i].nowAverage, apts[i].upDownPercent);
 
-                        // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
-                        ps.keywordSearch(jibun, placesSearchCB);
-                    }
+                    // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+                    ps.keywordSearch(jibun, placesSearchCB);
                 }
-            },
-            fail:function(apts){
-                fail(apts);
-                console.log(apts.responseText);
-            }   
-        });
-    }
+            }
+        },
+        fail:function(apts){
+            fail(apts);
+            console.log(apts.responseText);
+        }   
+    });
 }
 
 // 검색 목록을 클릭했을 때
@@ -140,29 +193,39 @@ function select(target) {
 
     // 클릭 시 검색 목록 사라지게 한다
     hideList.style.visibility = 'hidden';
-
-    
 }
 
 // 검색 버튼 & Enter 클릭 시
-function find() {
-    var apt_name = document.querySelector(".apt"),
-        located_name = document.querySelector('.located-name'),
+function find(index) {
+    var aptWrap = document.querySelectorAll(".info"),
         inputText = document.getElementById("addressInput"),
         hideList = document.getElementById("addressList");
-
+    
     // 검색 결과가 있는 경우에만 실행
     // 일치하는 값이 없는 경우는 apt_name의 값은 null임
     // 위의 search함수에서 data 값과는 다름
-    if (apt_name && hideList.style.visibility == "visible") {
-        inputText.value = apt_name.innerText;
+    if (aptWrap && hideList.style.visibility == "visible") {
+        var aptName = "",
+            locatedName = "";
+
+        if(index < 0) {
+            aptName = aptWrap[0].querySelector(".apt").innerText;
+            locatedName = aptWrap[0].querySelector(".located-name").innerText;
+        }
+        else {
+            aptName = aptWrap[index].querySelector(".apt").innerText;
+            locatedName = aptWrap[index].querySelector(".located-name").innerText;
+        }
         
+        // 아파트 이름 input 창에 넣습니다
+        inputText.value = aptName;
+
         // 매매 데이터 검색 및 카카오맵 API 실행
-        salesData(located_name.innerText);
+        salesData(locatedName);
 
         hideList.style.visibility = "hidden";
+        idx = -1;
     }
-
 }
 
 // 검색창 X버튼 클릭했을 때
@@ -171,6 +234,7 @@ function del() {
         addressInput = document.getElementById("addressInput"),
         clearBtn = document.querySelector(".btn-clear > i");
     
+    idx = -1;
     addressList.value = "";
     addressInput.value = "";
     clearBtn.style.visibility = "hidden";
@@ -190,12 +254,6 @@ function listVisibility(target, e){
         clearBtn.style.visibility = "visible";
     }
 }
-
-// Enter 키 입력 시 이벤트 2번 발생 방지
-function enterKey(e){
-    if (!e.isComposing && e.key == 'Enter') {find();}
-}
-
 
 // 키워드 검색 완료 시 호출되는 콜백함수 입니다
 function placesSearchCB (data, status, pagination) {
@@ -217,9 +275,9 @@ function placesSearchCB (data, status, pagination) {
     }
 }
 
+// 아파트 정보를 보여줍니다
 function displayApts(apts) {
     var bounds = new kakao.maps.LatLngBounds(),
-        fragment = document.createDocumentFragment(),
         aptInfo = document.getElementById("aptInfo-items"),
         salesList = document.getElementById("salesList"),
         avgList = document.getElementById("avgList");
@@ -237,7 +295,7 @@ function displayApts(apts) {
     removeAllChildNods(avgList);
 
     for(var i=0; i<apts.length; i++){
-        console.log(apts[i]);
+        
         // 주거시설이 아파트인 곳만 지도에 표시
         if(apts[i].category_name.match(/주거시설/)) {
             
@@ -327,19 +385,19 @@ function displayInfowindow(marker, apt){
 function getListItem(places) {
 
     var el = document.createElement('div'),
-    itemStr = '<div class="info" style="padding: 10px 0; height: 45%; width: 90%; cursor: pointer;" onclick="select(this);">';
+    itemStr = '<div class="info" style="padding: 10px 7px; height: 45%; width: 90%; cursor: pointer;" onclick="select(this);">';
                     
     if (!places.aptName) {
         itemStr += '    <span class="apt" style="font-size: 14px; font-weight:bold;">' +  places.locatedNM  + 
                     '</span>' +
-                    '   <div class="located-name" style="font-size: 11px; border-bottom: 1px solid; ">' +  places.locatedNM  + '</div>'+
+                    '   <div class="located-name" style="font-size: 11px;">' +  places.locatedNM  + '</div>'+
                     '</div>';
     }
             
     else {
         itemStr += '    <span class="apt" style="font-size: 14px; font-weight:bold;">' +  places.aptName  + 
                     '</span>' +
-                    '   <div class="located-name" style="font-size: 11px; border-bottom: 1px solid; ">' +  places.locatedNM  + '</div>'+
+                    '   <div class="located-name" style="font-size: 11px;">' +  places.locatedNM  + '</div>'+
                     '</div>';
     }
 
