@@ -35,9 +35,9 @@ a {
     font-size: 30px;
 }
 
-.navbar_logo i {
-    font-size: 30px;
-    color: var(--orange-color);
+.mainLogo {
+    height: 37px;
+    width: 40px;
 }
       
 .navbar_menu {
@@ -138,14 +138,18 @@ a {
     border-bottom:1px solid var(--gray-color);
 }  
 
+.custom_zoomcontrol_btn span:hover {
+    background-color: gainsboro;
+}
+
 /* ###검색창 css### */
 .input-wrap {
     position: absolute;
     display: inline-flex;
     border: 3px solid #6A24FE;
     border-radius: 3px;
-    height: 2em;
-    width: 320px;    
+    height: 2.8em;
+    width: 333px;    
     top: 95px;
     left: 15px;
     z-index: 2;
@@ -182,14 +186,12 @@ input[type=text] {
     cursor: pointer;
 }
 
-
-
 /* 검색 결과 목록 */
 #addressList {
     position: absolute;
-    width: 295px;
+    width: 302px;
     margin: 0;
-    top: 15.1%;
+    top: 140px;
     left: 15px;
     padding-left: 10px;
     background-color: #fff;
@@ -203,13 +205,93 @@ input[type=text] {
     z-index: 2;
 }
 
-.info:hover {
+#addressList .info:hover {
     background-color: gainsboro;
-    
 }
 
 .selected{
     background-color: gainsboro;
+}
+
+/* 커스텀 오버레이 */
+.wrap * {
+    padding: 0;
+    margin: 0;
+}
+
+.wrap {
+    position: absolute;
+    right: -145px;
+    bottom: 45px;
+    width: 280px;
+    height: 130px;
+    font-size: 12px;
+}
+
+.wrap .info {
+    width: 267px;
+    height: 120px;
+    background-color: #fff;
+    border-bottom: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+.wrap .info:nth-child(1) {
+    border: 0;
+    box-shadow: 0px 1px 2px #888;
+}
+
+.info .title {
+    font-size: 18px;
+    background-color: #eee;
+    padding: 5px 0 0 10px;
+    height: 35px;
+    border-bottom: 1px solid #ddd;
+}
+
+.info .close {
+    position: absolute;
+    top: 6px;
+    left: 235px;
+    cursor: pointer;
+}
+
+.info .close i {
+    font-size: 26px;
+    color: #888;
+}
+
+.info .logImg {
+    position: absolute;
+    left: 10px;
+    border: 1px solid #ddd;
+}
+
+.info img {
+    padding: 5px 5px;
+}
+
+.info .body {
+    position: relative;
+}
+
+.info .address {
+    position: relative;
+    margin: 13px 0 0 90px;
+    height: 100px;
+}
+
+.address .road {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.address .jibun {
+    color: #888;
+}
+
+.address .link {
+    color: #389cf9;
 }
 
 /* 매매 데이터 */
@@ -224,44 +306,55 @@ li {
 
 .info-container {
     display: none;
-    /* width: 1450px; */
 }
 
 /* 매매 데이터 화면 */
 .aptInfo-wrap {
-    display: flex;
     position: absolute;
     background-color: #fff;
-    top: 6.3%;
-    left: 1343.5px;
-    /* width: 400px; */
-    height: 812.5px;
+    top: 6.6%;
+    left: 77%;
+    width: 23%;
+    height: 93.3%;
     display: flex;
     flex-direction: column;
-    border: 1px solid grey;
-    z-index: 1;
+    border: 1px solid var(--white-color);
+    z-index: 2;
 }
-
-#aptInfo-items {
-    background: right / cover url("https://ic.zigbang.com/vp/BigData/33323/044b64b3d595af5896516858fa3f9c02692789e5.jpg?w=750&q=80&a=1");
+#aptInfo {  
     display: flex;
     align-items: end;
-    width: 400px;
-    height: 250px;
+    width: 100%;
+    height: 35%;
+    color: white;
+}
+
+.aptInfo-wrap .close{
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    top: 5px;
+    left: 10px;
+    cursor: pointer;
+}
+
+.aptInfo-wrap .close i {
+    font-size: 35px;
+    color: #eee;
 }
 
 /* 매매 평균가 정보 */
 .avgInfo {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid gainsboro;
+    align-items: center;
+    background-color:  #eee;
+    height: 40px;
     padding: 0 15px;
 }
 
-
 #avgList {
     padding: 15px 0;
-    border-bottom: 1px solid gainsboro;
 }
 
 #avgList > li {
@@ -271,11 +364,13 @@ li {
 }
 
 
-/* 매매 정보*/
+/* 매매가 정보*/
 .salesInfo {
     display: flex;
     justify-content: space-around;
-    border-bottom: 1px solid gainsboro;
+    align-items: center;
+    height: 40px;
+    background-color: #eee;
 }
 
 .salesInfo > div {
@@ -287,13 +382,12 @@ li {
 }
 
 #salesPrice {
-    padding-right: 20px;
     width: 100px;
 }
 
 #salesArea {
     padding-right: 25px;
-    width: 70px;
+    width: 100px;
 }
 
 #salesFloor {
@@ -303,7 +397,7 @@ li {
 /* 매매 목록 */
 #salesList > li {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     text-align: center;
     padding: 5px 0;
 }
@@ -314,15 +408,16 @@ li {
 }
 
 .price {
-    width: 120px;
+    width: 100px;
     padding-top: 4px;
 }
 
 .area {
     width: 100px;
+    padding-top: 3px;
 }
 
 .floor {
-    padding-top: 4px;
+    padding-top: 2px;
     padding-right: 5px;
 }
