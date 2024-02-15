@@ -105,7 +105,8 @@ function search(target) {
 
 // 검색 목록 방향키로 이동
 function keyboardHandle(target) {
-    var listItems = document.getElementsByClassName("info");
+    var listItems = document.getElementsByClassName("info"),
+        content = document.getElementById("addressList");
     
     if(target.keyCode == 40 && target.key == 'ArrowDown') {
         prevIdx = idx;
@@ -114,6 +115,10 @@ function keyboardHandle(target) {
         if(idx >= listItems.length) {
             idx = prevIdx;
             return;
+        }
+
+        if(idx > 0) {
+            content.scrollTop += 70;
         }
 
         listItems[idx].classList.add("selected");
@@ -126,9 +131,10 @@ function keyboardHandle(target) {
     else if(target.keyCode == 38 && target.key == 'ArrowUp') {
         prevIdx = idx;
         idx--;
-        
+        content.scrollTop -= 70;
+
         if(idx < 0) {
-            idx = 0;
+            idx = -1;
             return;
         }
 
@@ -422,7 +428,7 @@ function displayInfowindow(position, info){
 function getListItem(places) {
 
     var el = document.createElement('div'),
-    itemStr = '<div class="info" style="padding: 10px 7px; height: 45%; width: 90%; cursor: pointer;" onclick="select(this);">';
+    itemStr = '<div class="info" style="padding: 9px 7px; height: 45%; width: 90%; cursor: pointer;" onclick="select(this);">';
                     
     if (!places.aptName) {
         itemStr += '    <span class="apt" style="font-size: 14px; font-weight:bold;">' +  places.locatedNM  + 
