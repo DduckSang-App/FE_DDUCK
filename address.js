@@ -1,5 +1,5 @@
-    // 마커를 담을 배열입니다
-    var markers = [],
+// 마커를 담을 배열입니다
+var markers = [],
 
     // 커스텀 오버레이를 담을 변수입니다
     overlay = null,
