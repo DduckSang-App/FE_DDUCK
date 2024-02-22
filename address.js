@@ -32,6 +32,9 @@ var map = new kakao.maps.Map(mapContainer, mapOption);
 // 장소 검색 객체를 생성합니다
 var ps = new kakao.maps.services.Places(); 
 
+// 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
+var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+
 // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
 function zoomIn() {
     map.setLevel(map.getLevel() - 1);
@@ -159,7 +162,7 @@ function salesData(data) {
             dataType: "json",
             success: function(apts) {
                 var inputText = document.getElementById("addressInput").value;
-                let positions = [];
+                let aptsInfo = [];
                 
                 // 시군구로 검색했을 때
                 if(data === inputText){  
@@ -180,7 +183,7 @@ function salesData(data) {
                             ps.keywordSearch(road, function(result, status) {
                                 if (status == kakao.maps.services.Status.OK) {
                                     let filteredResults = result.filter(data => data.category_name.match(/주거시설/));
-                                    filteredResults.forEach(data => tmp.push([data.y, data.x]));
+                                    filteredResults.forEach(data => tmp.push([data.place_name.replace(/아파트/, ""), road, data.place_url, data.y, data.x]));
                                     resolve(); // Promise 완료
                                 } else {
                                     reject(); // Promise 실패
@@ -190,27 +193,35 @@ function salesData(data) {
                         promises.push(promise);
                     });
 
-                    // 모든 Promise가 완료될 때까지 기다린 후에 positions 출력
+                    // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
                     Promise.all(promises)
                         .then(() => {
                             // 중복 제거를 해줍니다
                             const removeDup = function(data) {
                                 return [...new Set(data.join("|").split("|"))]
-                                  .map((v) => v.split(","))
-                                  .map((v) => v.map((a) => +a));
+                                  .map((v) => v.split(","));
                             };
                             
-                            positions = removeDup(tmp);
+                            aptsInfo = removeDup(tmp);
                             
                             // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
                             let bounds = new kakao.maps.LatLngBounds();
 
-                            positions.forEach((data)=>{
+                            aptsInfo.forEach((data)=>{
                                 
                                 // data[0]: y, data[1]: x
-                                var aptsPosition = new kakao.maps.LatLng(data[0], data[1]); 
+                                var aptsPosition = new kakao.maps.LatLng(data[3], data[4]),
+                                    marker = addMarker(aptsPosition);
                                 
-                                addMarker(aptsPosition);
+                                (function(marker) {
+                                    kakao.maps.event.addListener(marker, 'mouseover', function() {
+                                        displayInfowindow(aptsPosition, data);
+                                    });
+
+                                    kakao.maps.event.addListener(marker, 'mouseout', function() {
+                                        closeOverlay();
+                                    });
+                                })(marker, data, aptsPosition);
 
                                 // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
                                 // LatLngBounds 객체에 좌표를 추가합니다
@@ -412,7 +423,7 @@ function displayApts(apts) {
             // LatLngBounds 객체에 좌표를 추가합니다
             bounds.extend(aptPosition);
 
-            displayInfowindow(aptPosition,apts[i]);
+            displayOverlay(aptPosition, apts[i]);
 
             // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
             (function(marker) {
@@ -424,7 +435,7 @@ function displayApts(apts) {
                     // 커스텀 오버레이를 표시합니다
                     overlay.setMap(map);
                 });
-            })(marker, apts[i]);
+            })(marker);
             
             break;
         }
@@ -463,9 +474,8 @@ function removeMarker() {
     markers = [];
 }
 
-// 마커를 클릭했을 때 호출되는 함수입니다
-// 오버레이를 표시합니다
-function displayInfowindow(position, info){
+// 마커를 클릭했을 때 오버레이를 표시하는 함수입니다
+function displayOverlay(position, info){
     var content = '<div class="wrap">' +
                     '<div class="info">' +
                         '<div class="title">' + 
@@ -491,6 +501,23 @@ function displayInfowindow(position, info){
         content: content,
         position: position      
     });
+}
+
+function displayInfowindow(position, info) {
+    var content = '<div class="wrap">' +
+                    '<div class="info>' +
+                        '<div class="title">' + info[0] + '</div>' +
+                        '<div class="address">' + info[1].replace(/ 0/, "") + '</div>' +
+                    '</div>' +
+                '</div>'
+
+    overlay = new kakao.maps.CustomOverlay({
+        content: content,
+        position: position      
+    });
+
+    // 커스텀 오버레이를 표시합니다
+    overlay.setMap(map);
 }
 
 // 검색결과 항목을 Element로 반환하는 함수입니다
