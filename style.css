@@ -213,7 +213,7 @@ input[type=text] {
     background-color: gainsboro;
 }
 
-/* 커스텀 오버레이 */
+/* 단일 마커 커스텀 오버레이 */
 .wrap * {
     padding: 0;
     margin: 0;
@@ -222,9 +222,9 @@ input[type=text] {
 .wrap {
     position: absolute;
     right: -145px;
-    bottom: 45px;
+    bottom: 52px;
     width: 280px;
-    height: 130px;
+    height: 125px;
     font-size: 12px;
 }
 
@@ -278,7 +278,7 @@ input[type=text] {
 .info .address {
     position: relative;
     margin: 13px 0 0 90px;
-    height: 100px;
+    height: 73px;
 }
 
 .address .road {
@@ -292,6 +292,35 @@ input[type=text] {
 
 .address .link {
     color: #389cf9;
+}
+
+/* 다중마커 커스텀 오버레이 */
+.apts-wrap {
+    position: absolute;
+    left: -75px;
+    bottom: 40px;
+    width: 250px;
+    height: 85px;
+}
+
+.apts-wrap .infos {
+    width: 230px;
+    height: 70px;
+    background-color: #fff;
+    border-bottom: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.infos .title {
+    font-size: 18px;
+    font-weight: bold;
+    height: 30px;
+    padding: 8px 8px;
+}
+
+.infos .address {
+    padding: 10px 8px;
 }
 
 /* 매매 데이터 */

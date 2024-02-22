@@ -165,75 +165,84 @@ function salesData(data) {
                 let aptsInfo = [];
                 
                 // 시군구로 검색했을 때
-                if(data === inputText){  
-                    // Promise 배열 생성
-                    let promises = [];
-                        tmp = [];
-                    
-                    // 지도에 표시되고 있는 마커를 제거합니다
-                    removeMarker();
+                if(data === inputText){
+                    if(apts.length) { 
+                        // Promise 배열 생성
+                        let promises = [];
+                            tmp = [];
+                        
+                        // 지도에 표시되고 있는 마커를 제거합니다
+                        removeMarker();
 
-                    apts.forEach((addr)=>{
-                        let roadAddr = addr.roadName.split(' '),
-                            roadNum = roadAddr[1].split('-').map(value => Number(value));
-                            road = `${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`;
+                        apts.forEach((addr)=>{
+                            let roadAddr = addr.roadName.split(' '),
+                                roadNum = roadAddr[1].split('-').map(value => Number(value));
+                                road = `${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`;
 
-                        // 각 ps.keywordSearch() 호출을 Promise로 감싸서 배열에 저장
-                        let promise = new Promise((resolve, reject) => {
-                            ps.keywordSearch(road, function(result, status) {
-                                if (status == kakao.maps.services.Status.OK) {
-                                    let filteredResults = result.filter(data => data.category_name.match(/주거시설/));
-                                    filteredResults.forEach(data => tmp.push([data.place_name.replace(/아파트/, ""), road, data.place_url, data.y, data.x]));
-                                    resolve(); // Promise 완료
-                                } else {
-                                    reject(); // Promise 실패
-                                }
+                            // 각 ps.keywordSearch() 호출을 Promise로 감싸서 배열에 저장
+                            let promise = new Promise((resolve, reject) => {
+                                ps.keywordSearch(road, function(result, status) {
+                                    if (status == kakao.maps.services.Status.OK) {
+                                        let filteredResults = result.filter(data => data.category_name.match(/주거시설/));
+                                        filteredResults.forEach(data => tmp.push({
+                                            apt: data.place_name.replace(/아파트/, ""), 
+                                            road_addr: data.road_address_name, 
+                                            x: data.x, 
+                                            y: data.y}));
+                                        
+                                        resolve(); // Promise 완료
+                                    } else {
+                                        reject(); // Promise 실패
+                                    }
+                                });
                             });
+                            promises.push(promise);
                         });
-                        promises.push(promise);
-                    });
 
-                    // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
-                    Promise.all(promises)
-                        .then(() => {
-                            // 중복 제거를 해줍니다
-                            const removeDup = function(data) {
-                                return [...new Set(data.join("|").split("|"))]
-                                  .map((v) => v.split(","));
-                            };
-                            
-                            aptsInfo = removeDup(tmp);
-                            
-                            // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
-                            let bounds = new kakao.maps.LatLngBounds();
+                        // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
+                        Promise.all(promises)
+                            .then(() => {
+                                // 중복 제거를 해줍니다
+                                // 주소는 같지만 아파트가 다른 경우가 있기 때문입니다
+                                // 예) 개포주공6단지, 개포주공7단지
+                                aptsInfo = Array.from(new Set(tmp.map(item => JSON.stringify(item)))).map(item => JSON.parse(item));
+                                console.log(Array.from(new Set(tmp.map(item => JSON.stringify(item)))));
+                                // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
+                                let bounds = new kakao.maps.LatLngBounds();
 
-                            aptsInfo.forEach((data)=>{
-                                
-                                // data[0]: y, data[1]: x
-                                var aptsPosition = new kakao.maps.LatLng(data[3], data[4]),
-                                    marker = addMarker(aptsPosition);
-                                
-                                (function(marker) {
-                                    kakao.maps.event.addListener(marker, 'mouseover', function() {
-                                        displayInfowindow(aptsPosition, data);
-                                    });
+                                aptsInfo.forEach((data)=>{
+                                    
+                                    // data[0]: y, data[1]: x
+                                    var aptsPosition = new kakao.maps.LatLng(data.y, data.x),
+                                        marker = addMarker(aptsPosition);
+                                    
+                                    (function(marker) {
+                                        kakao.maps.event.addListener(marker, 'mouseover', function() {
+                                            displayInfowindow(aptsPosition, data);
+                                        });
 
-                                    kakao.maps.event.addListener(marker, 'mouseout', function() {
-                                        closeOverlay();
-                                    });
-                                })(marker, data, aptsPosition);
+                                        kakao.maps.event.addListener(marker, 'mouseout', function() {
+                                            closeOverlay();
+                                        });
+                                    })(marker, data, aptsPosition);
 
-                                // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
-                                // LatLngBounds 객체에 좌표를 추가합니다
-                                bounds.extend(aptsPosition);
+                                    // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+                                    // LatLngBounds 객체에 좌표를 추가합니다
+                                    bounds.extend(aptsPosition);
+                                })
+
+                                // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+                                map.setBounds(bounds);
                             })
-
-                            // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
-                            map.setBounds(bounds);
-                        })
-                        .catch((error) => {
-                            console.error('Failed:', error);
-                        });
+                            .catch((error) => {
+                                console.error('Failed:', error);
+                            });
+                    }
+                    
+                    // 해당 연도 및 당월 매매 데이터가 존재하지 않을 때
+                    else {
+                        alert("당월 매매 데이터가 존재하지 않습니다.");
+                    }
                 }
 
                 // 아파트명으로 검색했을 때
@@ -452,7 +461,7 @@ function displayApts(apts) {
 function addMarker(position) {
     var imageSrc = 'home_burgundy.png', // 마커이미지의 주소입니다    
     imageSize = new kakao.maps.Size(55, 55), // 마커이미지의 크기입니다
-    imageOption = {offset: new kakao.maps.Point(26, 54)}, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+    imageOption = {offset: new kakao.maps.Point(27, 54)}, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
     markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
         marker = new kakao.maps.Marker({
             map: map,
@@ -504,12 +513,12 @@ function displayOverlay(position, info){
 }
 
 function displayInfowindow(position, info) {
-    var content = '<div class="wrap">' +
-                    '<div class="info>' +
-                        '<div class="title">' + info[0] + '</div>' +
-                        '<div class="address">' + info[1].replace(/ 0/, "") + '</div>' +
+    var content = '<div class="apts-wrap">' +
+                    '<div class="infos">' +
+                        '<div class="title">' + info.apt.replace(/아파트/, "") + '</div>' +
+                        '<div class="address">' + info.road_addr + '</div>' +
                     '</div>' +
-                '</div>'
+                '</div>';
 
     overlay = new kakao.maps.CustomOverlay({
         content: content,
