@@ -32,8 +32,13 @@ var map = new kakao.maps.Map(mapContainer, mapOption);
 // 장소 검색 객체를 생성합니다
 var ps = new kakao.maps.services.Places(); 
 
-// 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
-var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    // 마커 클러스터러를 생성합니다 
+var clusterer = new kakao.maps.MarkerClusterer({
+    map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체 
+    averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정 
+    minLevel: 10, // 클러스터 할 최소 지도 레벨 
+    disableClickZoom: true
+});
 
 // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
 function zoomIn() {
@@ -163,7 +168,7 @@ function salesData(data) {
             success: function(apts) {
                 var inputText = document.getElementById("addressInput").value;
                 let aptsInfo = [];
-                
+                console.log(inputText);
                 // 시군구로 검색했을 때
                 if(data === inputText){
                     if(apts.length) { 
@@ -173,6 +178,21 @@ function salesData(data) {
                         
                         // 지도에 표시되고 있는 마커를 제거합니다
                         removeMarker();
+                        
+                        // 매매 검색 결과에 추가된 아파트 이름을 제거합니다
+                        removeAllChildNods(aptInfo);
+
+                        // 매매 검색 결과 목록에 추가된 항목들을 제거합니다
+                        removeAllChildNods(salesList);
+
+                        // 매매 평균가 정보를 제거합니다
+                        removeAllChildNods(avgList);
+
+                        // 오버레이를 제거합니다
+                        closeOverlay();
+
+                        // 매매 정보창을 닫습니다
+                        closeInfo();
 
                         apts.forEach((addr)=>{
                             let roadAddr = addr.roadName.split(' '),
@@ -191,7 +211,8 @@ function salesData(data) {
                                             y: data.y}));
                                         
                                         resolve(); // Promise 완료
-                                    } else {
+                                    } 
+                                    else {
                                         reject(); // Promise 실패
                                     }
                                 });
@@ -202,17 +223,16 @@ function salesData(data) {
                         // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
                         Promise.all(promises)
                             .then(() => {
+
                                 // 중복 제거를 해줍니다
                                 // 주소는 같지만 아파트가 다른 경우가 있기 때문입니다
                                 // 예) 개포주공6단지, 개포주공7단지
                                 aptsInfo = Array.from(new Set(tmp.map(item => JSON.stringify(item)))).map(item => JSON.parse(item));
-                                console.log(Array.from(new Set(tmp.map(item => JSON.stringify(item)))));
+
                                 // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
                                 let bounds = new kakao.maps.LatLngBounds();
 
                                 aptsInfo.forEach((data)=>{
-                                    
-                                    // data[0]: y, data[1]: x
                                     var aptsPosition = new kakao.maps.LatLng(data.y, data.x),
                                         marker = addMarker(aptsPosition);
                                     
@@ -224,7 +244,12 @@ function salesData(data) {
                                         kakao.maps.event.addListener(marker, 'mouseout', function() {
                                             closeOverlay();
                                         });
-                                    })(marker, data, aptsPosition);
+
+                                        kakao.maps.event.addListener(marker, 'click', function() {
+                                            document.getElementById("addressInput").value = data.apt;
+                                            salesData()
+                                        });
+                                    })(marker, data, aptsPosition, inputText);
 
                                     // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
                                     // LatLngBounds 객체에 좌표를 추가합니다
@@ -483,7 +508,7 @@ function removeMarker() {
     markers = [];
 }
 
-// 마커를 클릭했을 때 오버레이를 표시하는 함수입니다
+// 마커를 클릭했을 때 아파트에 관한 자세한 정보를 표시하는 함수입니다
 function displayOverlay(position, info){
     var content = '<div class="wrap">' +
                     '<div class="info">' +
@@ -512,6 +537,7 @@ function displayOverlay(position, info){
     });
 }
 
+// 시군구 검색 시 마커 위에 마우스를 올렸을 때 아파트 이름과 주소를 표시하는 함수입니다
 function displayInfowindow(position, info) {
     var content = '<div class="apts-wrap">' +
                     '<div class="infos">' +
@@ -669,8 +695,7 @@ function getAvgInfo(tmp) {
 }
 
 function closeInfo() {
-    $('.info-container').css('display', 'none');
-    
+    $('.info-container').css('display', 'none');   
 }
 
 function closeOverlay() {
