@@ -201,7 +201,7 @@ function salesData(data) {
 
                     apts.forEach((addr)=>{
                         let roadAddr = addr.roadName.split(' '),
-                            roadNum = roadAddr[1].split('-').map(value => Number(value));
+                            roadNum = roadAddr[1].split('-').map(value => Number(value)),
                             road = `${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`;
 
                         // 각 ps.keywordSearch() 호출을 Promise로 감싸서 배열에 저장
@@ -278,14 +278,18 @@ function salesData(data) {
 
             // 아파트명으로 검색했을 때
             else{
+                
                 // 오버레이를 제거합니다
                 if(overlay) {closeOverlay();}     
 
                 for(var i=0; i<apts.length; i++) {
                     if(apts[i].aptName === inputText) {
-                        // 지번을 저장합니다
-                        jibun = apts[i].dong + ' ' + apts[i].bonBun_BuBun;
 
+                        // 도로명을 나누어서 저장합니다
+                        let roadAddr = apts[i].roadName.split(' '),
+                            roadNum = roadAddr[1].split('-').map(value => Number(value) > 0 ? Number(value) : ""),
+                            road = `${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`;
+                        
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
                             
@@ -296,7 +300,7 @@ function salesData(data) {
                         avgSales.push(apts[i].prevAverage, apts[i].nowAverage, apts[i].upDownPercent);
                             
                         // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
-                        ps.keywordSearch(jibun, placesSearchCB);
+                        ps.keywordSearch(road, placesSearchCB);
                     }
                 }
             }
