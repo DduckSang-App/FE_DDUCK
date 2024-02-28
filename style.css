@@ -9,10 +9,17 @@
     --orange-color: #d49466;
 }
 
-/* ###메인화면 css### */
+.gothic-a1-regular {
+    font-family: "Gothic A1", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
 
+/* ###메인화면 css### */
 body {
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: "Gothic A1", sans-serif;
+    font-weight: bold;
     margin: 0;
     border-bottom: 1px solid var(--black-color) !important;
 }
