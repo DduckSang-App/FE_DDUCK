@@ -229,7 +229,7 @@ input[type=text] {
 .wrap {
     position: absolute;
     right: -145px;
-    bottom: 52px;
+    bottom: 40px;
     width: 280px;
     height: 125px;
     font-size: 12px;
