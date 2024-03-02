@@ -304,14 +304,14 @@ input[type=text] {
 /* 다중마커 커스텀 오버레이 */
 .apts-wrap {
     position: absolute;
-    left: -75px;
-    bottom: 40px;
-    width: 250px;
-    height: 85px;
+    left: -125px;
+    bottom: 32px;
+    width: 280px;
+    height: 80px;
 }
 
 .apts-wrap .infos {
-    width: 230px;
+    width: 260px;
     height: 70px;
     background-color: #fff;
     border-bottom: 2px solid #ccc;
