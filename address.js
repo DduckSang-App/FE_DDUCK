@@ -68,7 +68,7 @@ function search(target) {
             $.ajax({
                 type: "POST",
                 contentType : 'application/json',
-                url: "http://ec2-13-125-143-90.ap-northeast-2.compute.amazonaws.com:8080/searchAddress",
+                url: "https://dducksangdb.store/searchAddress",
                 data: JSON.stringify({SiGunGu: addressInput.value}),
                 dataType:'json',
                 success: function(data) {
@@ -155,15 +155,14 @@ function keyboardHandle(target) {
 }
 
 // 아파트 매매 정보
-function salesData(data, data2) {
+function salesData(data, road_name) {
     let location_name = data,
-        road_name = data2,
         siGunGu = data.replace(/특별시|광역시|특별자치시|특별자치도|[ㄱ-힣]{1,5}동/g, "");
 
     $.ajax({
         type: "POST",
         contentType: "application/json",
-        url: "http://ec2-13-125-143-90.ap-northeast-2.compute.amazonaws.com:8080/InfoBuilding",
+        url: "https://dducksangdb.store/InfoBuilding",
         data: JSON.stringify({
             SiGunGu: data,
             startDate: "202311",
@@ -208,9 +207,10 @@ function salesData(data, data2) {
                         let promise = new Promise((resolve, reject) => {
                             ps.keywordSearch(road, function(result, status) {
                                 if (status == kakao.maps.services.Status.OK) {  
-                                    let filteredResults = result.filter(data => data.category_name.match(/주거시설/));
+                                    let filteredResults = result.filter(data => data.category_name.match(/부동산\s>\s주거시설\s>\s(아파트(?!\s>\s아파트부속시설)|도시형생활주택|빌라,\s주택|오피스텔)/g));
+                                    
                                     filteredResults.forEach(data => tmp.push({
-                                        apt: data.place_name.replace(/아파트/, ""), 
+                                        apt: data.place_name.replace(/아파트/, ""),
                                         road_addr: data.road_address_name, 
                                         x: data.x, 
                                         y: data.y
@@ -229,7 +229,6 @@ function salesData(data, data2) {
                     // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
                     Promise.all(promises)
                         .then(() => {
-
                             // 중복 제거를 해줍니다
                             // 같은 주소에 아파트가 다른 경우가 있기 때문입니다
                             // 예) 개포주공6단지, 개포주공7단지
@@ -286,9 +285,10 @@ function salesData(data, data2) {
                     // 도로명 주소를 저장합니다.
                     let roadAddr = apts[i].roadName.split(' '),
                         roadNum = roadAddr[1].split('-').map(value => Number(value) > 0 ? Number(value) : ""),
-                        road = `${siGunGu}${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd();
+                        road = `${siGunGu.trimEnd()} ${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd();
 
-                    if(apts[i].aptName === inputText || road === road_name) {
+                    if(apts[i].aptName === inputText || road == road_name) {
+
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
                         
@@ -395,6 +395,7 @@ function listVisibility(listStatus, e){
 function placesSearchCB (data, status) {
     
     if (status === kakao.maps.services.Status.OK) {
+        
         displayApts(data);
     } 
     else if (status === kakao.maps.services.Status.ZERO_RESULT) {
@@ -428,7 +429,7 @@ function displayApts(apts) {
 
     // 매매 평균가 정보를 제거합니다
     removeAllChildNods(avgList);
-
+    
     for(var i=0; i<apts.length; i++){
         // 주거시설이 아파트인 곳만 지도에 표시
         if(apts[i].category_name.match(/주거시설/)) {
