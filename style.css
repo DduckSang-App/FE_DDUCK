@@ -34,17 +34,36 @@ a {
     justify-content: space-between;
     align-items: center;
     background-color: var(--white-color);
-    padding: 6px 20px;
+    padding: 5px 20px;
+    height: 70px;
     
 }
 
 .navbar_logo {
+    display: flex;
+    width: 300px;
+    height: 50px;
     font-size: 30px;
 }
 
+.navbar_logo a {
+    position:absolute;
+    left: 85px;
+    top: 26px;
+    height: 40px;
+    width: 190px;
+    padding: 4px 0 0 4px;
+}
+
+.navbar_logo a:hover {
+    background-color: var(--gray-color);
+    border-radius: 4px;
+}
+
 .mainLogo {
-    height: 37px;
-    width: 40px;
+    position:absolute;
+    height: 45px;
+    width: 50px;
 }
       
 .navbar_menu {
@@ -58,66 +77,11 @@ a {
     padding: 6px 10px;
 }
 
-.navbar_menu li:hover {
-    background-color: var(--gray-color);
-    border-radius: 4px;
-}
-
-.fa-filter-circle-xmark {
-    padding-right: 5px;
-    color: var(--navy-color);
-}
-
-.fa-arrow-up {
-    padding-right: 5px;
-    color: var(--red-color);
-}
-
-.fa-arrow-down {
-    padding-right: 5px;
-    color: var(--blue-color);
-}
-
-.fa-bookmark {
-    padding-right: 5px;
-    color: var(--yellow-color);
-}
-
-.navbar_login {
-    display: flex;
-    list-style: none;
-    font-size: 16px;
-    padding-left: 0;
-}
-
-.navbar_login i {
-    font-size: 20px;
-    color: var(--orange-color);
-}
-
-.navbar_login li {
-    padding: 6px 10px;
-}
-
-.navbar_login li:hover {
-    background-color: var(--gray-color);
-    border-radius: 4px;
-}
-
-.toggleBtn {
-    display: none;
-    position: absolute;
-    right: 32px;
-    font-size: 20px;
-    color:var(--orange-color)
-}
-
-
 /* 확대, 축소 버튼 */
 .custom_zoomcontrol_btn {
     position:absolute;
-    top: 95px;
-    left: 350px;
+    top: 105px;
+    left: 365px;
     width:31px;
     height:68px;
     overflow:hidden;
@@ -129,8 +93,8 @@ a {
 
 .custom_zoomcontrol_btn span {
     display: block;
-    width: 31px;
-    height: 33px;
+    width: 32px;
+    height: 34px;
     text-align:center;
     cursor:pointer;
     box-sizing: border-box;
@@ -154,11 +118,11 @@ a {
     position: absolute;
     display: inline-flex;
     border: 3px solid #6A24FE;
-    border-radius: 3px;
-    height: 2.8em;
+    border-radius: 5px;
+    height: 2.5em;
     width: 333px;    
-    top: 95px;
-    left: 15px;
+    top: 105px;
+    left: 20px;
     z-index: 2;
 }
 
@@ -196,10 +160,10 @@ input[type=text] {
 /* 검색 결과 목록 */
 #addressList {
     position: absolute;
-    width: 302px;
+    width: 336px;
     margin: 0;
-    top: 140px;
-    left: 15px;
+    top: 151px;
+    left: 20px;
     padding-left: 10px;
     background-color: #fff;
     border: 1px solid gray;
@@ -228,19 +192,24 @@ input[type=text] {
 
 .wrap {
     position: absolute;
+    left: 0;
     right: -145px;
-    bottom: 40px;
+    bottom: 35px;
+    margin-left: -144px;
     width: 280px;
-    height: 125px;
+    height: 130px;
     font-size: 12px;
+    text-align: left;
+    overflow: hidden;
 }
 
 .wrap .info {
-    width: 267px;
+    width: 278px;
     height: 120px;
     background-color: #fff;
     border-bottom: 2px solid #ccc;
     border-radius: 4px;
+    overflow: hidden;
 }
 
 .wrap .info:nth-child(1) {
@@ -251,9 +220,10 @@ input[type=text] {
 .info .title {
     font-size: 18px;
     background-color: #eee;
-    padding: 5px 0 0 10px;
-    height: 35px;
+    padding: 10px 0 0 10px;
+    height: 30px;
     border-bottom: 1px solid #ddd;
+    font-weight: bold;
 }
 
 .info .close {
@@ -271,15 +241,17 @@ input[type=text] {
 .info .logImg {
     position: absolute;
     left: 10px;
+    bottom: 13px;
     border: 1px solid #ddd;
 }
 
 .info img {
-    padding: 5px 5px;
+    padding: 0 5px;
 }
 
 .info .body {
     position: relative;
+    overflow: hidden;
 }
 
 .info .address {
@@ -322,12 +294,12 @@ input[type=text] {
 .infos .title {
     font-size: 18px;
     font-weight: bold;
-    height: 30px;
-    padding: 8px 8px;
+    height: 25px;
+    padding: 13px 0 8px 8px;
 }
 
 .infos .address {
-    padding: 10px 8px;
+    padding: 0 8px;
 }
 
 /* 매매 데이터 */
