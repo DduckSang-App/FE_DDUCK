@@ -315,43 +315,37 @@ function salesData(data, road_name) {
 
 // API 검색에 맞는 형식으로 주소를 변경해줍니다
 function changeLocationNM(name) {
-    if(name.match(/서울/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    name = [name.split(" ")[0], name.split(" ")[1]];
+
+    if(name[0].match(/서울/)) {
         name[0] += "특별시";
     }
 
-    else if(name.match(/부산|대구|인천|광주|대전|울산/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/부산|대구|인천|광주|대전|울산/)) {
         name[0] += "광역시";
     }
 
-    else if(name.match(/경기/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/경기/)) {
         name[0] += "도";
     }
 
-    else if(name.match(/충북/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/충북/)) {
         name[0] += "충청북도";
     }
 
-    else if(name.match(/충남/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/충남/)) {
         name[0] += "충청남도";
     }
 
-    else if(name.match(/전남/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/전남/)) {
         name[0] += "전라남도";
     }
 
-    else if(name.match(/경북/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/경북/)) {
         name[0] += "경상북도";
     }
 
-    else if(name.match(/경남/)) {
-        name = [name.split(" ")[0], name.split(" ")[1]];
+    else if(name[0].match(/경남/)) {
         name[0] += "경상남도";
     }
 
