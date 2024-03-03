@@ -252,7 +252,7 @@ function salesData(data, road_name) {
 
                                     kakao.maps.event.addListener(marker, 'click', function() {
                                         document.getElementById("addressInput").value = data.apt;
-                                        salesData(location_name, data.road_addr);
+                                        salesData(changeLocationNM(data.road_addr), data.road_addr);
                                     });
                                 })(marker, data, aptsPosition);
 
@@ -287,7 +287,7 @@ function salesData(data, road_name) {
                         roadNum = roadAddr[1].split('-').map(value => Number(value) > 0 ? Number(value) : ""),
                         road = `${siGunGu.trimEnd()} ${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd();
 
-                    if(apts[i].aptName === inputText || road == road_name) {
+                    if(apts[i].aptName === inputText || road === road_name) {
 
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
@@ -311,6 +311,51 @@ function salesData(data, road_name) {
             console.log(apts.responseText);
         }   
     });
+}
+
+// API 검색에 맞는 형식으로 주소를 변경해줍니다
+function changeLocationNM(name) {
+    if(name.match(/서울/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "특별시";
+    }
+
+    else if(name.match(/부산|대구|인천|광주|대전|울산/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "광역시";
+    }
+
+    else if(name.match(/경기/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "도";
+    }
+
+    else if(name.match(/충북/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "충청북도";
+    }
+
+    else if(name.match(/충남/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "충청남도";
+    }
+
+    else if(name.match(/전남/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "전라남도";
+    }
+
+    else if(name.match(/경북/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "경상북도";
+    }
+
+    else if(name.match(/경남/)) {
+        name = [name.split(" ")[0], name.split(" ")[1]];
+        name[0] += "경상남도";
+    }
+
+    return name.join(" ");
 }
 
 // 검색 목록을 클릭했을 때
@@ -432,7 +477,7 @@ function displayApts(apts) {
     
     for(var i=0; i<apts.length; i++){
         // 주거시설이 아파트인 곳만 지도에 표시
-        if(apts[i].category_name.match(/주거시설/)) {
+        if(apts[i].category_name.match(/부동산\s>\s주거시설\s>\s(아파트(?!\s>\s아파트부속시설)|도시형생활주택|빌라,\s주택|오피스텔)/g)) {
             // 마커를 생성하고 지도 위에 표시합니다
             var aptPosition = new kakao.maps.LatLng(apts[i].y, apts[i].x),
                 marker = addMarker(aptPosition),
