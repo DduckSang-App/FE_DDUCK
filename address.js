@@ -64,17 +64,17 @@ function search(target) {
     
                 return;
             }
-    
+
             $.ajax({
                 type: "POST",
                 contentType : 'application/json',
-                url: "https://dducksangdb.store/searchAddress",
+                url: "http://ec2-13-125-143-90.ap-northeast-2.compute.amazonaws.com:8080/searchAddress",
                 data: JSON.stringify({SiGunGu: addressInput.value}),
                 dataType:'json',
                 success: function(data) {
                     var addressList = document.getElementById("addressList"),
                         fragment = document.createDocumentFragment();
-    
+
                     // 검색 결과 목록에 추가된 것들을 제거합니다
                     removeAllChildNods(addressList);
         
@@ -105,11 +105,16 @@ function search(target) {
                     fail(error);
                 }
             });
+            
+            // 검색 목록 idx 시작이 0이므로 -1로 초기화
             idx = -1;
         }, 300);
     }
 
-    if(!target.isComposing){ keyboardHandle(target); }
+    if(!target.isComposing){
+        console.log(target);
+        keyboardHandle(target); 
+    }
 }
 
 // 검색 목록 방향키로 이동
@@ -156,13 +161,12 @@ function keyboardHandle(target) {
 
 // 아파트 매매 정보
 function salesData(data, road_name) {
-    let location_name = data,
-        siGunGu = data.replace(/특별시|광역시|특별자치시|특별자치도|[ㄱ-힣]{1,5}동/g, "");
+    let siGunGu = data.replace(/특별시|광역시|특별자치시|특별자치도|[ㄱ-힣]{1,5}동/g, "");
 
     $.ajax({
         type: "POST",
         contentType: "application/json",
-        url: "https://dducksangdb.store/InfoBuilding",
+        url: "http://ec2-13-125-143-90.ap-northeast-2.compute.amazonaws.com:8080/InfoBuilding",
         data: JSON.stringify({
             SiGunGu: data,
             startDate: "202311",
@@ -171,7 +175,8 @@ function salesData(data, road_name) {
         dataType: "json",
         success: function(apts) {
             var inputText = document.getElementById("addressInput").value;
-            let aptsInfo = [];
+            let currentLocation = document.getElementById("location_name"),
+                aptsInfo = [];
                 
             // 시군구로 검색했을 때
             if(data === inputText){
@@ -211,7 +216,8 @@ function salesData(data, road_name) {
                                     
                                     filteredResults.forEach(data => tmp.push({
                                         apt: data.place_name.replace(/아파트/, ""),
-                                        road_addr: data.road_address_name, 
+                                        road_addr: data.road_address_name,
+                                        addr_name: data.address_name, 
                                         x: data.x, 
                                         y: data.y
                                     }));
@@ -240,7 +246,9 @@ function salesData(data, road_name) {
                             aptsInfo.forEach((data)=>{
                                 var aptsPosition = new kakao.maps.LatLng(data.y, data.x),
                                     marker = addMarker(aptsPosition);
-                                    
+                                
+                                currentLocation.innerText = inputText;
+
                                 (function(marker) {
                                     kakao.maps.event.addListener(marker, 'mouseover', function() {
                                         displayInfowindow(aptsPosition, data);
@@ -252,7 +260,7 @@ function salesData(data, road_name) {
 
                                     kakao.maps.event.addListener(marker, 'click', function() {
                                         document.getElementById("addressInput").value = data.apt;
-                                        salesData(changeLocationNM(data.road_addr), data.road_addr);
+                                        salesData(changeLocationNM(data.addr_name), data.road_addr);
                                     });
                                 })(marker, data, aptsPosition);
 
@@ -269,17 +277,16 @@ function salesData(data, road_name) {
                         });
                 }
                     
-                // 해당 연도 및 당월 매매 데이터가 존재하지 않을 때
+                // 매매 데이터가 존재하지 않을 때
                 else {
-                    alert("당월 매매 데이터가 존재하지 않습니다.");
+                    alert("해당 매매 데이터가 존재하지 않습니다.");
                 }
             }
 
-            // 아파트명으로 검색했을 때
+            // 아파트 및 다중 마커를 클릭했을 때
             else{
-
                 // 오버레이를 제거합니다
-                if(overlay) {closeOverlay();}     
+                if(overlay) {closeOverlay();} 
 
                 for(var i=0; i<apts.length; i++) {
                     // 도로명 주소를 저장합니다.
@@ -287,7 +294,10 @@ function salesData(data, road_name) {
                         roadNum = roadAddr[1].split('-').map(value => Number(value) > 0 ? Number(value) : ""),
                         road = `${siGunGu.trimEnd()} ${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd();
 
+                    // 아파트 이름 및 도로명 주소를 비교합니다
                     if(apts[i].aptName === inputText || road === road_name) {
+                        // 현 위치를 상단에 표시해줍니다
+                        currentLocation.innerText = apts[i].locatedNM;
 
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
@@ -315,7 +325,7 @@ function salesData(data, road_name) {
 
 // API 검색에 맞는 형식으로 주소를 변경해줍니다
 function changeLocationNM(name) {
-    name = [name.split(" ")[0], name.split(" ")[1]];
+    name = [name.split(" ")[0], name.split(" ")[1], name.split(" ")[2]];
 
     if(name[0].match(/서울/)) {
         name[0] += "특별시";
@@ -532,32 +542,6 @@ function displayApts(apts) {
     map.setBounds(bounds);
 }
 
-// 마커를 생성하고 지도 위에 표시하는 함수입니다
-function addMarker(position) {
-    var imageSrc = 'house.png', // 마커이미지의 주소입니다    
-    imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
-    imageOption = {offset: new kakao.maps.Point(19, 40)}, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-    markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
-        marker = new kakao.maps.Marker({
-            map: map,
-            position: position,
-            image: markerImage
-    });
-
-    marker.setMap(map); // 지도 위에 마커를 표출합니다
-    markers.push(marker); // 배열에 생성된 마커를 추가합니다
-
-    return marker;
-}
-
-// 지도 위에 표시되고 있는 마커를 모두 제거합니다
-function removeMarker() {
-    for ( var i = 0; i < markers.length; i++ ) {
-        markers[i].setMap(null);
-    }   
-    markers = [];
-}
-
 // 마커를 클릭했을 때 아파트에 관한 자세한 정보를 표시하는 함수입니다
 function displayOverlay(position, info){
     var content = '<div class="wrap">' +
@@ -629,13 +613,6 @@ function getListItem(places) {
     el.className = 'input-result';
 
     return el;
-}
-
- // 검색결과 목록의 자식 Element를 제거하는 함수입니다
-function removeAllChildNods(el) {   
-    while (el.hasChildNodes()) {
-        el.removeChild (el.lastChild);
-    }
 }
 
 // 아파트 이름과 층 정보를 반환하는 함수입니다
@@ -742,6 +719,39 @@ function getAvgInfo(tmp) {
     fragment.appendChild(el);
 
     return fragment
+}
+
+// 마커를 생성하고 지도 위에 표시하는 함수입니다
+function addMarker(position) {
+    var imageSrc = 'house.png', // 마커이미지의 주소입니다    
+    imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
+    imageOption = {offset: new kakao.maps.Point(19, 40)}, // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+    markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+        marker = new kakao.maps.Marker({
+            map: map,
+            position: position,
+            image: markerImage
+    });
+
+    marker.setMap(map); // 지도 위에 마커를 표출합니다
+    markers.push(marker); // 배열에 생성된 마커를 추가합니다
+
+    return marker;
+}
+
+// 지도 위에 표시되고 있는 마커를 모두 제거합니다
+function removeMarker() {
+    for ( var i = 0; i < markers.length; i++ ) {
+        markers[i].setMap(null);
+    }   
+    markers = [];
+}
+
+// 검색결과 목록의 자식 Element를 제거하는 함수입니다
+function removeAllChildNods(el) {   
+    while (el.hasChildNodes()) {
+        el.removeChild (el.lastChild);
+    }
 }
 
 function closeInfo() {
