@@ -52,8 +52,8 @@ function zoomOut() {
 // 검색
 function search(target) {    
     var addressInput = document.getElementById("addressInput");
-        
-    if(target.isComposing || target.keyCode == 8){
+
+    if(target.isComposing || target.keyCode === 8){
         setTimeout(() => {
             if(!addressInput.value){
                 var addressList = document.getElementById("addressList"),
@@ -111,18 +111,18 @@ function search(target) {
         }, 300);
     }
 
-    if(!target.isComposing){
-        console.log(target);
-        keyboardHandle(target); 
-    }
+    keyboardHandle(target);
 }
 
 // 검색 목록 방향키로 이동
 function keyboardHandle(target) {
+    if(target.isComposing) return;
+
     var listItems = document.getElementsByClassName("info"),
         content = document.getElementById("addressList");
     
-    if(target.keyCode == 40 && target.key == 'ArrowDown') {
+    if(target.keyCode === 40 && target.key === 'ArrowDown') {
+        target.preventDefault();
         prevIdx = idx;
         idx++;
         
@@ -132,9 +132,9 @@ function keyboardHandle(target) {
         }
 
         if(idx > 0) {
-            content.scrollTop += 70;
+            content.scrollTop += 60;
         }
-
+        
         listItems[idx].classList.add("selected");
         
         if(prevIdx >= 0 ) {
@@ -142,10 +142,10 @@ function keyboardHandle(target) {
         }
     }
 
-    else if(target.keyCode == 38 && target.key == 'ArrowUp') {
+    else if(target.keyCode === 38 && target.key === 'ArrowUp') {
         prevIdx = idx;
         idx--;
-        content.scrollTop -= 70;
+        content.scrollTop -= 80;
 
         if(idx < 0) {
             idx = -1;
@@ -156,12 +156,12 @@ function keyboardHandle(target) {
         listItems[prevIdx].classList.remove("selected");
     }
     
-    if (target.keyCode == 13 && target.key == 'Enter') { find(idx); }
+    if (target.keyCode === 13 && target.key === 'Enter') { find(idx); }
 }
 
 // 아파트 매매 정보
 function salesData(data, road_name) {
-    let siGunGu = data.replace(/특별시|광역시|특별자치시|특별자치도|[ㄱ-힣]{1,5}동/g, "");
+    let siGunGu = data.replace(/특별시|광역시|[ㄱ-힣]{1,5}동|[ㄱ-힣]{1,5}리/g, "");
 
     $.ajax({
         type: "POST",
@@ -169,15 +169,15 @@ function salesData(data, road_name) {
         url: "http://ec2-13-125-143-90.ap-northeast-2.compute.amazonaws.com:8080/InfoBuilding",
         data: JSON.stringify({
             SiGunGu: data,
-            startDate: "202311",
-            endDate: "202312"
+            startDate: "202312",
+            endDate: "202401"
         }),
         dataType: "json",
         success: function(apts) {
             var inputText = document.getElementById("addressInput").value;
             let currentLocation = document.getElementById("location_name"),
                 aptsInfo = [];
-                
+            
             // 시군구로 검색했을 때
             if(data === inputText){
                 if(apts.length) { 
@@ -207,7 +207,7 @@ function salesData(data, road_name) {
                         let roadAddr = addr.roadName.split(' '),
                             roadNum = roadAddr[1].split('-').map(value => Number(value)),
                             road = `${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`;
-
+                        
                         // 각 ps.keywordSearch() 호출을 Promise로 감싸서 배열에 저장
                         let promise = new Promise((resolve, reject) => {
                             ps.keywordSearch(road, function(result, status) {
@@ -221,7 +221,7 @@ function salesData(data, road_name) {
                                         x: data.x, 
                                         y: data.y
                                     }));
-                                        
+                                    
                                     resolve(); // Promise 완료
                                 } 
                                 else {
@@ -233,13 +233,13 @@ function salesData(data, road_name) {
                     });
 
                     // 모든 Promise가 완료될 때까지 기다린 후에 aptsInfo 출력
-                    Promise.all(promises)
+                    Promise.allSettled(promises)
                         .then(() => {
                             // 중복 제거를 해줍니다
                             // 같은 주소에 아파트가 다른 경우가 있기 때문입니다
                             // 예) 개포주공6단지, 개포주공7단지
                             aptsInfo = Array.from(new Set(tmp.map(item => JSON.stringify(item)))).map(item => JSON.parse(item));
-
+                            
                             // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
                             let bounds = new kakao.maps.LatLngBounds();
 
@@ -247,6 +247,7 @@ function salesData(data, road_name) {
                                 var aptsPosition = new kakao.maps.LatLng(data.y, data.x),
                                     marker = addMarker(aptsPosition);
                                 
+                                // 현 위치를 상단에 표시해줍니다
                                 currentLocation.innerText = inputText;
 
                                 (function(marker) {
@@ -292,12 +293,20 @@ function salesData(data, road_name) {
                     // 도로명 주소를 저장합니다.
                     let roadAddr = apts[i].roadName.split(' '),
                         roadNum = roadAddr[1].split('-').map(value => Number(value) > 0 ? Number(value) : ""),
-                        road = `${siGunGu.trimEnd()} ${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd();
-
+                        road = `${siGunGu.trimEnd()} ${roadAddr[0]} ${roadNum[0]} ${roadNum[1]}`.trimEnd(),
+                        bonBun_BuBun = apts[i].bonBun_BuBun.split('-').map(value => Number(value) > 0 ? Number(value) : "");
+                        
                     // 아파트 이름 및 도로명 주소를 비교합니다
                     if(apts[i].aptName === inputText || road === road_name) {
+
+                        // 카카오맵API의 데잍와 비교하기 위해 아파트를 붙여줍니다
+                        inputText += "아파트";
+
                         // 현 위치를 상단에 표시해줍니다
                         currentLocation.innerText = apts[i].locatedNM;
+                        
+                        // 지번을 저장합니다
+                        jibun = (apts[i].locatedNM.replace(/특별시\s|광역시\s|도\s/g, " ") + ' ' + bonBun_BuBun).replace(/,/, ' ');
 
                         // 매매 데이터를 저장합니다
                         sales = apts[i].salesList;
@@ -309,7 +318,17 @@ function salesData(data, road_name) {
                         avgSales.push(apts[i].prevAverage, apts[i].nowAverage, apts[i].upDownPercent);
                         
                         // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
-                        ps.keywordSearch(road, placesSearchCB);
+                        ps.keywordSearch(road, function(result, status) {
+                            if (status === kakao.maps.services.Status.OK) {
+                                for(var i=0; i<result.length; i++){
+                                    if(result[i].category_name.match(/부동산\s>\s주거시설\s>\s(아파트(?!\s<\s아파트부속시설)|도시형생활주택|빌라,\s주택|오피스텔)/g)){
+                                        if(inputText === result[i].place_name | road === result[i].road_address_name | jibun === result[i].address_name.split('-').join(' ')){
+                                            displayApts(result[i]);   
+                                        }
+                                    }
+                                }
+                            } 
+                        });
                     }
                     
                 }
@@ -322,6 +341,21 @@ function salesData(data, road_name) {
         }   
     });
 }
+
+// // 아파트 검색을 위한 비교할 정보들을 각 변수에 저장합니다
+// function aptInfoList(data) {
+//     // 매매 데이터 
+//     sales = data.salesList;
+
+//     // 아파트 준공일 
+//     buildYear = data.buildYear;
+
+//     // 지번
+//     jibun = data.locatedNM + ' ' + data.bonBun_BuBun;
+
+//     // 매매 평균가
+//     avgSales.push(data.prevAverage, data.nowAverage, data.upDownPercent);
+// }
 
 // API 검색에 맞는 형식으로 주소를 변경해줍니다
 function changeLocationNM(name) {
@@ -440,26 +474,6 @@ function listVisibility(listStatus, e){
     }
 }
 
-// 키워드 검색 완료 시 호출되는 콜백함수 입니다
-function placesSearchCB (data, status) {
-    
-    if (status === kakao.maps.services.Status.OK) {
-        
-        displayApts(data);
-    } 
-    else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-        alert('검색 결과가 존재하지 않습니다.');
-        return;
-
-    } 
-    else if (status === kakao.maps.services.Status.ERROR) {
-
-        alert('검색 결과 중 오류가 발생했습니다.');
-        return;
-
-    }
-}
-
 // 아파트 정보들을 표시합니다
 function displayApts(apts) {
     var bounds = new kakao.maps.LatLngBounds(),
@@ -479,61 +493,57 @@ function displayApts(apts) {
     // 매매 평균가 정보를 제거합니다
     removeAllChildNods(avgList);
     
-    for(var i=0; i<apts.length; i++){
+    // for(var i=0; i<apts.length; i++){
         // 주거시설이 아파트인 곳만 지도에 표시
-        if(apts[i].category_name.match(/부동산\s>\s주거시설\s>\s(아파트(?!\s>\s아파트부속시설)|도시형생활주택|빌라,\s주택|오피스텔)/g)) {
-            // 마커를 생성하고 지도 위에 표시합니다
-            var aptPosition = new kakao.maps.LatLng(apts[i].y, apts[i].x),
-                marker = addMarker(aptPosition),
-                aptItems = getAptInfo(apts[i].place_name, buildYear),
-                avgItems = getAvgInfo(avgSales),
-                randNum = Math.floor(Math.random() * 4) + 1,
-                saleItems = "";
+        // 마커를 생성하고 지도 위에 표시합니다
+        var aptPosition = new kakao.maps.LatLng(apts.y, apts.x),
+            marker = addMarker(aptPosition),
+            aptItems = getAptInfo(apts.place_name, buildYear),
+            avgItems = getAvgInfo(avgSales),
+            randNum = Math.floor(Math.random() * 4) + 1,
+            saleItems = "";
             
-            if(Array.isArray(sales) && !sales.length) {
-                saleItems = getSalesInfo(sales);
-                salesList.appendChild(saleItems);
-            }
-
-            else {
-                sales.forEach((saleLists) => {
-                    saleItems = getSalesInfo(saleLists);
-                    salesList.appendChild(saleItems);
-                });
-            }
-            
-            // 아파트 사진 
-            if(randNum < 3) {
-                aptInfo.style.background = `url(/apt${randNum}.jpg) no-repeat bottom/cover`;
-            }
-            else {
-                aptInfo.style.background = `url(/apt${randNum}.jpg) no-repeat center/cover`;
-            }
-            
-            aptInfo.appendChild(aptItems);
-            avgList.appendChild(avgItems);
-            
-            // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
-            // LatLngBounds 객체에 좌표를 추가합니다
-            bounds.extend(aptPosition);
-
-            displayOverlay(aptPosition, apts[i]);
-
-            // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
-            (function(marker) {
-                kakao.maps.event.addListener(marker, 'click', function() {
-                    
-                    // 매매 정보 화면을 가립니다
-                    $('.info-container').css('display', 'block');
-                    
-                    // 커스텀 오버레이를 표시합니다
-                    overlay.setMap(map);
-                });
-            })(marker);
-            
-            break;
+        if(Array.isArray(sales) && !sales.length) {
+            saleItems = getSalesInfo(sales);
+            salesList.appendChild(saleItems);
         }
-    }
+
+        else {
+            sales.forEach((saleLists) => {
+                saleItems = getSalesInfo(saleLists);
+                salesList.appendChild(saleItems);
+            });
+        }
+            
+        // 아파트 사진 
+        if(randNum < 3) {
+            aptInfo.style.background = `url(/apt${randNum}.jpg) no-repeat bottom/cover`;
+        }
+        else {
+            aptInfo.style.background = `url(/apt${randNum}.jpg) no-repeat center/cover`;
+        }
+            
+        aptInfo.appendChild(aptItems);
+        avgList.appendChild(avgItems);
+            
+        // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+        // LatLngBounds 객체에 좌표를 추가합니다
+        bounds.extend(aptPosition);
+
+        displayOverlay(aptPosition, apts);
+
+        // 마커를 클릭했을 때 커스텀 오버레이를 표시합니다
+        (function(marker) {
+            kakao.maps.event.addListener(marker, 'click', function() {
+                    
+                // 매매 정보 화면을 가립니다
+                $('.info-container').css('display', 'block');
+                    
+                // 커스텀 오버레이를 표시합니다
+                overlay.setMap(map);
+            });
+        })(marker);
+    // }
     
     // 매매 평균가를 담은 배열을 초기화시킵니다
     avgSales = [];
@@ -547,7 +557,7 @@ function displayOverlay(position, info){
     var content = '<div class="wrap">' +
                     '<div class="info">' +
                         '<div class="title">' + 
-                            info.place_name.replace(/아파트/, "") +
+                            info.place_name.replace(/아파트|오피스텔/, "") +
                             '<div class="close" onclick="closeOverlay()" title="닫기"><i class="fa-solid fa-xmark"></i></div>' +
                         '</div>' +
                         '<div class="body">' + 
@@ -556,7 +566,7 @@ function displayOverlay(position, info){
                             '</div>' +
                             '<div class="address">' +
                                 `<div class="road">${info.road_address_name}</div>` +
-                                `<div class="jibun">(지번) ${info.address_name.match(/[ㄱ-힣]{1,5}동/g)} ${info.address_name.match(/[0-9]|[^가-힣\w\s]/g).join('')} <div>` +
+                                `<div class="jibun">(지번) ${info.address_name.match(/[ㄱ-힣]{1,5}읍|[ㄱ-힣]{1,5}면|[ㄱ-힣]{1,5}동/g)} ${info.address_name.match(/[0-9]|[^가-힣\w\s]/g).join('')} <div>` +
                                 `<div><a href=${info.place_url} target=_blank class=link title=클릭>카카오맵</a></div>` +
                             '</div>' +
                         '</div>' +
